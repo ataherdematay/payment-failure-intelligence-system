@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ML Models (large files)
+ml-service/models/*.joblib
+!ml-service/models/.gitkeep
+
+# Data
+data-generator/output/
+*.csv
+!data-generator/sample.csv
+
+# Logs
+logs/
+*.log
+
+# Testing
+coverage/
+.nyc_output/
+htmlcov/
+
+# OS
+Thumbs.db
