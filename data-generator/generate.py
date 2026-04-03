@@ -93,28 +93,79 @@ def calculate_failure_rate(device: str, method: str, country: str,
 
 
 def determine_failure_reason(amount: float, device: str, country: str,
-                              hour: int) -> str:
-    """Determine failure reason with context-aware weighting."""
+                              hour: int, payment_method: str = 'credit_card') -> str:
+    """
+    Determine failure reason with strong context-aware weighting.
+    Modifiers are intentionally large to create learnable patterns for the ML model.
+    """
     weights = dict(FAILURE_REASONS)
 
-    # High amounts → more insufficient_funds and fraud
-    if amount > 500:
-        weights['insufficient_funds'] *= 1.3
-        weights['fraud_suspected'] *= 1.5
+    # Amount-based signals (strong)
+    if amount > 2000:
+        weights['fraud_suspected'] *= 4.0
+        weights['insufficient_funds'] *= 3.0
+        weights['network_error'] *= 0.3
+    elif amount > 500:
+        weights['fraud_suspected'] *= 2.5
+        weights['insufficient_funds'] *= 2.0
     elif amount > 200:
-        weights['insufficient_funds'] *= 1.15
+        weights['insufficient_funds'] *= 1.5
+    elif amount < 30:
+        weights['invalid_credentials'] *= 2.5
+        weights['expired_card'] *= 2.0
+        weights['network_error'] *= 0.5
 
-    # Night hours → more network errors
+    # Night hours (2-5 AM) → network errors dominate
     if 2 <= hour <= 5:
-        weights['network_error'] *= 1.8
+        weights['network_error'] *= 6.0
+        weights['fraud_suspected'] *= 0.4
+        weights['insufficient_funds'] *= 0.5
+    elif 22 <= hour or hour <= 1:
+        weights['network_error'] *= 2.5
 
-    # Mobile → more invalid credentials
+    # Device signals (strong)
     if device == 'mobile':
-        weights['invalid_credentials'] *= 1.4
+        weights['invalid_credentials'] *= 4.0
+        weights['network_error'] *= 1.5
+        weights['expired_card'] *= 0.5
+    elif device == 'desktop':
+        weights['expired_card'] *= 3.0
+        weights['invalid_credentials'] *= 0.4
+        weights['insufficient_funds'] *= 1.3
+    elif device == 'tablet':
+        weights['network_error'] *= 2.0
+        weights['insufficient_funds'] *= 1.4
 
-    # High-risk countries → more fraud
+    # Country signals (strong)
     if country in ('BR', 'IN'):
-        weights['fraud_suspected'] *= 1.4
+        weights['fraud_suspected'] *= 4.0
+        weights['network_error'] *= 2.0
+        weights['expired_card'] *= 0.4
+    elif country in ('DE', 'UK'):
+        weights['expired_card'] *= 3.0
+        weights['insufficient_funds'] *= 1.5
+        weights['fraud_suspected'] *= 0.4
+    elif country == 'US':
+        weights['insufficient_funds'] *= 2.0
+        weights['network_error'] *= 0.7
+    elif country == 'TR':
+        weights['invalid_credentials'] *= 2.0
+        weights['network_error'] *= 1.5
+
+    # Payment method signals (strong)
+    if payment_method == 'bank_transfer':
+        weights['network_error'] *= 3.5
+        weights['invalid_credentials'] *= 0.5
+    elif payment_method == 'digital_wallet':
+        weights['expired_card'] *= 0.2
+        weights['invalid_credentials'] *= 2.0
+        weights['insufficient_funds'] *= 1.5
+    elif payment_method == 'debit_card':
+        weights['insufficient_funds'] *= 2.5
+        weights['fraud_suspected'] *= 0.6
+    elif payment_method == 'credit_card':
+        weights['expired_card'] *= 2.5
+        weights['fraud_suspected'] *= 1.3
 
     return weighted_choice(weights)
 
