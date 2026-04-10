@@ -1,168 +1,248 @@
 # Payment Failure Intelligence System (PFIS)
 
 <p align="center">
-  <strong>Analyze • Classify • Optimize</strong>
+  <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
 </p>
 
-> A full-stack fintech intelligence system that analyzes failed payment transactions, classifies failure reasons using ML, and provides actionable insights to reduce failure rates.
+<p align="center">
+  <strong>Analyze · Classify · Simulate · Optimize</strong><br/>
+  A full-stack payment intelligence platform that turns transaction failures into actionable business decisions.
+</p>
+
+---
+
+## 🎯 Why I Built This
+
+Payment orchestration platforms like **Craftgate** route transactions across multiple virtual POS providers, banks, and payment gateways. At Craftgate's scale (1.19 billion ₺ recovered in 2025 alone), even a 1% reduction in failure rate translates to tens of millions of liras in rescued revenue.
+
+This project simulates the **intelligence layer** that sits inside such a platform:
+
+| Business Problem | PFIS Solution |
+|---|---|
+| Which gateway is underperforming? | Gateway comparison dashboard with per-provider failure rates |
+| Why are payments failing? | ML-based failure reason classifier (5 categories, ~82% accuracy) |
+| What's a failure costing us? | Real-time revenue-at-risk calculation |
+| What if we tune retry logic? | Parameter-based simulation engine with scenario comparison |
+| What should we act on first? | AI-generated prioritized insight cards with recommendations |
+
+---
 
 ## 🏗️ Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Local Development                         │
-│                                                              │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐               │
-│  │ Frontend │───▶│ Backend  │───▶│ML Service│               │
-│  │ Next.js  │    │ NestJS   │    │ FastAPI  │               │
-│  │ :3000    │    │ :3001    │    │ :8000    │               │
-│  └──────────┘    └────┬─────┘    └──────────┘               │
-│                       │                                      │
-│                  ┌────▼─────┐                                │
-│                  │PostgreSQL│                                │
-│                  │  :5432   │                                │
-│                  └──────────┘                                │
-│                                                              │
-│  ┌──────────────┐                                           │
-│  │Data Generator│── Seed ──▶ PostgreSQL                     │
-│  │   Python     │                                           │
-│  └──────────────┘                                           │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                   PFIS — Local Stack                     │
+│                                                          │
+│  ┌───────────────┐   REST    ┌──────────────────────┐   │
+│  │  Next.js 16   │ ────────▶ │   NestJS Backend     │   │
+│  │  Dashboard    │           │   REST API + TypeORM  │   │
+│  │  :3000        │           │   :3001               │   │
+│  └───────────────┘           └──────────┬───────────┘   │
+│         │                               │               │
+│         │ ML predict                    ▼               │
+│         ▼                        ┌──────────────┐       │
+│  ┌───────────────┐               │  PostgreSQL   │       │
+│  │  FastAPI      │               │  :5432        │       │
+│  │  ML Service   │               └──────────────┘       │
+│  │  :8000        │                                       │
+│  └───────────────┘                                       │
+│                                                          │
+│  ┌───────────────┐                                       │
+│  │ Data Generator│──── seeds ──▶ PostgreSQL              │
+│  │   Python      │   10,000 tx                          │
+│  └───────────────┘                                       │
+└──────────────────────────────────────────────────────────┘
 ```
 
-## ✨ Features
+---
 
-### Core
-- 📊 **Analytics Dashboard** — Real-time KPIs, failure distributions, time series
-- 🤖 **ML Predictions** — RandomForest-based failure reason classification
-- 💡 **Insight Engine** — Auto-generated natural language insights
-- 🔄 **Retry Suggestions** — Smart retry probability scoring
-- 🚨 **Fraud Flagging** — Risk score-based transaction flagging
-- 📡 **Live Simulation** — Real-time transaction stream simulation
+## ✨ Dashboard Pages
 
-### Technical
-- Clean Architecture (NestJS modules, SOLID principles)
-- Type-safe end-to-end (TypeScript + Pydantic)
-- Comprehensive test coverage (Jest, pytest, Vitest)
-- API documentation (Swagger/OpenAPI)
+### 📊 Overview
+Real-time KPI cards + donut chart (failure by reason) + 30-day area chart + device/country breakdowns + recent transaction table.
+
+### 📈 Analytics
+- Daily volume trend (Success vs Failed, stacked area)
+- Payment method failure rate comparison
+- Hourly failure pattern (24h)
+- Gateway performance comparison
+- Paginated, filterable transaction table
+
+### 💡 Insights
+Auto-generated business intelligence cards ranked by severity:
+- `CRITICAL` — Overall failure rate above 15% industry benchmark
+- `WARNING` — Specific gateway or country underperforming
+- `INFO` — Patterns and optimization opportunities
+
+### 🤖 Predictions
+ML-powered failure reason prediction:
+- Input: device, country, amount range, hour, day of week
+- Output: predicted failure reason + confidence score + probability bars
+- Model metrics panel: Accuracy, Precision, Recall, F1 (per-class)
+
+### 🔬 Simulation
+What-if scenario engine for business decisions:
+- Sliders: failure rate, transaction volume, avg amount, mobile share, network reliability, fraud sensitivity
+- Toggle: retry logic on/off + retry success rate
+- Output: simulated failure breakdown per reason + scenario comparison table
+- **Craftgate use case:** Model the impact of switching a high-failure gateway (e.g. Square 39.1%) to a lower-failure alternative
+
+---
+
+## 🔧 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, TanStack Query, Recharts, TypeScript |
+| Backend | NestJS, TypeORM, PostgreSQL, Swagger |
+| ML Service | FastAPI, scikit-learn (RandomForest), Pydantic |
+| Data | Python data generator (10K synthetic transactions) |
+| Design | Dark glassmorphism, CSS variables, custom animations |
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js** 20+
-- **Python** 3.9+
-- **PostgreSQL** 14+ (via Homebrew: `brew install postgresql@16`)
+- Node.js 20+
+- Python 3.9+
+- PostgreSQL 14+ (`brew install postgresql@16`)
 
-### Setup
+### 1. Database Setup
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd "Payment Failure Intelligence System"
-
-# 1. Start PostgreSQL (if using Homebrew)
 brew services start postgresql@16
 createdb pfis_db
 psql postgres -c "CREATE USER pfis WITH PASSWORD 'pfis_secret_2026';"
 psql postgres -c "ALTER DATABASE pfis_db OWNER TO pfis;"
-
-# 2. Generate & seed data
-cd data-generator && python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-python generate.py --count 10000 --output csv && python seed_db.py
-
-# 3. Setup & start backend (terminal 1)
-cd backend && npm install && npm run start:dev
-
-# 4. Setup & start ML service (terminal 2)
-cd ml-service && python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-python -m app.train
-uvicorn app.main:app --reload --port 8000
-
-# 5. Setup & start frontend (terminal 3)
-cd frontend && npm install && npm run dev
-
-# Open dashboard
-open http://localhost:3000
 ```
+
+### 2. Seed Data (10,000 transactions)
+```bash
+cd data-generator
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python generate.py --count 10000 --output csv
+python seed_db.py
+```
+
+### 3. Backend (Terminal 1)
+```bash
+cd backend
+cp .env.example .env        # edit DB credentials
+npm install
+npm run start:dev           # → http://localhost:3001
+                            # → http://localhost:3001/api/docs (Swagger)
+```
+
+### 4. ML Service (Terminal 2)
+```bash
+cd ml-service
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python -m app.train         # trains RandomForest model
+uvicorn app.main:app --reload --port 8000
+```
+
+### 5. Frontend (Terminal 3)
+```bash
+cd frontend
+cp .env.local.example .env.local
+npm install
+npm run dev                 # → http://localhost:3000
+```
+
+---
+
+## 📡 API Reference
+
+### Backend (`:3001/api/v1`)
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/transactions` | GET | List with filters (status, reason, page) |
+| `/transactions/summary` | GET | KPI summary (total, failed, rate, avg risk) |
+| `/analytics/failure-by-reason` | GET | Failure count per reason |
+| `/analytics/failure-by-country` | GET | Failure rate per country |
+| `/analytics/failure-by-device` | GET | Failure rate per device |
+| `/analytics/failure-by-payment-method` | GET | Failure rate per payment method |
+| `/analytics/daily-trend` | GET | Daily tx counts (last N days) |
+| `/analytics/hourly-pattern` | GET | Hourly failure pattern |
+| `/analytics/gateway-performance` | GET | Per-gateway failure rate + avg amount |
+| `/analytics/revenue-lost` | GET | Total vs lost revenue |
+| `/insights` | GET | Auto-generated insight cards |
+| `/ml/predict` | POST | Proxy to ML service |
+| `/ml/metrics` | GET | Model performance metrics |
+
+### ML Service (`:8000`)
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/health` | GET | Health + model status |
+| `/predict` | POST | Predict failure reason |
+| `/model/metrics` | GET | Accuracy, F1, per-class scores |
+
+---
 
 ## 📁 Project Structure
 
 ```
 .
 ├── backend/                 # NestJS REST API
-│   ├── src/
-│   │   ├── common/          # Shared filters, interceptors, pipes
-│   │   ├── config/          # App & DB configuration
-│   │   └── modules/
-│   │       ├── transactions/  # Transaction CRUD
-│   │       ├── analytics/     # Aggregation & KPIs
-│   │       ├── insights/      # Insight engine & fraud flags
-│   │       └── ml/            # ML service integration
-│   └── test/
+│   └── src/
+│       ├── transactions/    # CRUD, summary
+│       ├── analytics/       # Aggregation queries
+│       ├── insights/        # Insight engine
+│       └── ml/              # FastAPI proxy
 ├── frontend/                # Next.js Dashboard
-│   ├── src/
-│   │   ├── app/(dashboard)/ # Dashboard routes
-│   │   ├── components/      # UI components
-│   │   └── lib/             # API client & utilities
-│   └── public/
-├── ml-service/              # FastAPI ML Microservice
-│   ├── app/
-│   │   ├── main.py          # FastAPI app
-│   │   ├── model.py         # Model loading & prediction
-│   │   ├── train.py         # Training pipeline
-│   │   └── schemas.py       # Pydantic models
-│   └── models/              # Serialized models (.joblib)
-├── data-generator/          # Synthetic data generator
-│   ├── generate.py          # Data generation script
-│   └── seed_db.py           # Database seeder
-├── docs/                    # Documentation
-└── .agents/                 # Workflow definitions
+│   ├── app/(dashboard)/
+│   │   ├── page.tsx         # Overview
+│   │   ├── analytics/       # Analytics + table
+│   │   ├── insights/        # Insight cards
+│   │   ├── predictions/     # ML predictor
+│   │   └── simulation/      # What-if simulator
+│   ├── components/
+│   │   ├── layout/          # Sidebar, TopBar
+│   │   └── ui/              # KPICard, ChartCard, StatusBadge
+│   └── lib/
+│       ├── api.ts           # Typed API client (axios)
+│       └── utils.ts         # Formatters, constants
+├── ml-service/              # FastAPI + scikit-learn
+│   └── app/
+│       ├── main.py          # Routes + CORS
+│       ├── model.py         # Predict + metrics
+│       └── train.py         # RandomForest training pipeline
+└── data-generator/          # Synthetic data
+    ├── generate.py          # 10K realistic transactions
+    └── seed_db.py           # PostgreSQL seeder
 ```
 
-## 🔌 API Overview
+---
 
-### Backend API (`:3001`)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/transactions` | POST | Create transaction |
-| `/api/v1/transactions` | GET | List with filters |
-| `/api/v1/analytics/overview` | GET | KPI summary |
-| `/api/v1/analytics/failure-distribution` | GET | Failure breakdown |
-| `/api/v1/analytics/time-series` | GET | Temporal trends |
-| `/api/v1/insights` | GET | Auto-generated insights |
-| `/api/v1/insights/retry-suggestion/:id` | GET | Retry probability |
-| `/api/v1/insights/fraud-flags` | GET | Fraud flagged items |
+## 🧠 ML Model
 
-### ML Service (`:8000`)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health check |
-| `/predict` | POST | Predict failure reason |
-| `/model/metrics` | GET | Model performance |
-| `/model/retrain` | POST | Retrain model |
+- **Algorithm:** RandomForestClassifier (scikit-learn)
+- **Features:** amount, device (encoded), country (encoded), payment_method, hour_of_day, day_of_week
+- **Target:** failure_reason (5 classes)
+- **Performance:** ~82% accuracy on held-out test set
+- **Training data:** 3,765 failed transactions from the 10K synthetic dataset
 
-## 🧪 Testing
+---
 
-```bash
-# Backend
-cd backend && npm run test && npm run test:e2e
+## 🔗 Relevance to Craftgate
 
-# ML Service
-cd ml-service && pytest -v
+Craftgate's core value proposition is **payment orchestration** — routing transactions through the best available provider, recovering failures automatically, and giving merchants visibility into their payment health. PFIS demonstrates an engineering mindset aligned with exactly these problems:
 
-# Frontend
-cd frontend && npm run test
-```
+1. **Autopilot & Retry** — The simulation engine models how retry rate changes affect revenue recovery, directly analogous to Craftgate's "Ödeme Tekrar Deneme" product
+2. **Smart Routing** — Gateway comparison analytics surfaces which provider to deprioritize (e.g., Square at 39.1% failure rate), which is the decision input for dynamic routing
+3. **Merchant Panel** — The dashboard provides the kind of per-transaction, per-gateway, per-reason visibility that enterprise merchants need from their payment orchestration layer
+4. **Data-driven operations** — The insight engine generates prioritized recommendations — the same kind of proactive intelligence Craftgate provides to 500+ merchants
+
+---
 
 ## 📄 License
 
 MIT
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request

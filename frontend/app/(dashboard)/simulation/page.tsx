@@ -3,7 +3,47 @@
 import { useState, useCallback } from 'react';
 import { FAILURE_REASON_LABELS, FAILURE_REASON_COLORS, formatPercent, formatCurrency } from '@/lib/utils';
 import { FailureReason } from '@/lib/api';
-import { Play, RotateCcw, TrendingDown, DollarSign, Activity, Sliders } from 'lucide-react';
+import { Play, RotateCcw, TrendingDown, DollarSign, Activity, Sliders, Zap } from 'lucide-react';
+
+// ─── Craftgate-specific preset scenarios ─────────────────────────────────────
+interface Preset {
+  id: string;
+  label: string;
+  emoji: string;
+  description: string;
+  overrides: Partial<SimParams>;
+}
+
+const PRESETS: Preset[] = [
+  {
+    id: 'baseline',
+    label: 'Current State',
+    emoji: '📊',
+    description: 'Baseline portfolio — matches live dashboard data',
+    overrides: {},
+  },
+  {
+    id: 'gateway-switch',
+    label: 'Drop Square Gateway',
+    emoji: '🔀',
+    description: 'Remove Square (39.1% failure) — route to Stripe/Adyen',
+    overrides: { baseFailureRate: 0.25, networkReliability: 0.92 },
+  },
+  {
+    id: 'retry-autopilot',
+    label: 'Retry Autopilot ON',
+    emoji: '🔄',
+    description: 'Enable Craftgate-style smart retry for transient failures',
+    overrides: { retryEnabled: true, retrySuccessRate: 0.55 },
+  },
+  {
+    id: 'high-volume',
+    label: 'Peak Season',
+    emoji: '📈',
+    description: '10× volume surge — Black Friday scenario',
+    overrides: { totalTransactions: 100000, networkReliability: 0.72 },
+  },
+];
 
 interface SimParams {
   totalTransactions: number;
@@ -110,10 +150,19 @@ export default function SimulationPage() {
   const [params, setParams] = useState<SimParams>(DEFAULTS);
   const [result, setResult] = useState<SimResult | null>(() => runSimulation(DEFAULTS));
   const [baseline] = useState<SimResult>(() => runSimulation(DEFAULTS));
+  const [activePreset, setActivePreset] = useState<string>('baseline');
 
   const update = useCallback(<K extends keyof SimParams>(key: K, value: SimParams[K]) => {
     setParams(prev => ({ ...prev, [key]: value }));
+    setActivePreset('');
   }, []);
+
+  function applyPreset(preset: Preset) {
+    const next = { ...DEFAULTS, ...preset.overrides };
+    setParams(next);
+    setResult(runSimulation(next));
+    setActivePreset(preset.id);
+  }
 
   function runSim() {
     setResult(runSimulation(params));
@@ -122,6 +171,7 @@ export default function SimulationPage() {
   function resetSim() {
     setParams(DEFAULTS);
     setResult(runSimulation(DEFAULTS));
+    setActivePreset('baseline');
   }
 
   const improvement = result && baseline
@@ -133,7 +183,7 @@ export default function SimulationPage() {
 
       {/* Header */}
       <div className="glass" style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <div style={{
             width: 40, height: 40, borderRadius: 10,
             background: 'rgba(99,102,241,0.12)',
@@ -150,6 +200,40 @@ export default function SimulationPage() {
               Adjust parameters and model the impact on your payment failure rate
             </p>
           </div>
+        </div>
+
+        {/* Craftgate Preset Quick-Load buttons */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 4 }}>
+            <Zap size={13} color="var(--accent-warning)" />
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Presets
+            </span>
+          </div>
+          {PRESETS.map(preset => (
+            <button
+              key={preset.id}
+              onClick={() => applyPreset(preset)}
+              title={preset.description}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 20,
+                border: activePreset === preset.id
+                  ? '1.5px solid var(--accent-primary)'
+                  : '1px solid var(--border-subtle)',
+                background: activePreset === preset.id
+                  ? 'rgba(99,102,241,0.12)'
+                  : 'var(--bg-tertiary)',
+                color: activePreset === preset.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                transition: 'all 0.15s',
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}
+            >
+              <span>{preset.emoji}</span>
+              <span>{preset.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
