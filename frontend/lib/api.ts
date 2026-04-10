@@ -15,7 +15,7 @@ export const mlClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 export type FailureReason =
   | 'insufficient_funds'
@@ -25,8 +25,8 @@ export type FailureReason =
   | 'invalid_credentials';
 
 export type TransactionStatus = 'success' | 'failed' | 'pending';
-export type DeviceType = 'mobile' | 'desktop' | 'tablet';
-export type PaymentMethod = 'credit_card' | 'debit_card' | 'bank_transfer' | 'digital_wallet';
+export type DeviceType        = 'mobile' | 'desktop' | 'tablet';
+export type PaymentMethod     = 'credit_card' | 'debit_card' | 'bank_transfer' | 'digital_wallet';
 
 export interface Transaction {
   id: string;
@@ -44,66 +44,74 @@ export interface Transaction {
   createdAt: string;
 }
 
-export interface OverviewData {
-  totalTransactions: number;
-  failedTransactions: number;
-  successfulTransactions: number;
-  failureRate: number;
-  revenueAtRisk: number;
-  avgTransactionAmount: number;
-  retrySuccessRate: number;
-  periodComparison: { failureRateChange: number; transactionVolumeChange: number };
+// Backend returns { data: [], meta: { total, page, limit, totalPages } }
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
 }
 
-export interface FailureDistributionItem {
-  reason: FailureReason;
-  count: number;
-  percentage: number;
-}
-
-export interface TimeSeriesItem {
-  date: string;
+export interface SummaryData {
   total: number;
   failed: number;
-  failureRate: number;
-  byReason: Record<FailureReason, number>;
+  success: number;
+  pending: number;
+  failureRate: string;
+  avgRiskScore: string;
+}
+
+// Analytics raw shapes (what backend actually returns)
+export interface FailureByReasonItem {
+  reason: FailureReason;
+  count: string;
+  avgRisk: string;
 }
 
 export interface DimensionItem {
-  name: string;
-  total: number;
-  failed: number;
-  failureRate: number;
+  country?: string;
+  device?: string;
+  paymentMethod?: string;
+  gateway?: string;
+  total: string;
+  failed: string;
+  failureRate: string;
+  avgAmount?: string;
 }
 
+export interface DailyTrendItem {
+  date: string;
+  total: string;
+  failed: string;
+  success: string;
+}
+
+export interface HourlyItem {
+  hour: number;
+  total: string;
+  failed: string;
+}
+
+export interface RevenueLost {
+  totalRevenue: string;
+  lostRevenue: string;
+  lostPercent: string;
+}
+
+// Insights (from backend /api/v1/insights)
 export interface Insight {
   id: string;
   type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  category: string;
   title: string;
   description: string;
-  metric: { value: number; comparison?: number; unit: string; trend: 'up' | 'down' | 'stable' };
+  metric: string;
   recommendation: string;
-  affectedTransactions: number;
-  generatedAt: string;
+  // Optional extended fields
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  affectedTransactions?: number;
+  generatedAt?: string;
 }
 
-export interface FraudFlag {
-  transactionId: string;
-  riskScore: number;
-  flags: string[];
-  recommendation: string;
-}
-
-export interface RetrySuggestion {
-  transactionId: string;
-  retryRecommended: boolean;
-  successProbability: number;
-  reasoning: string;
-  optimalRetryDelay: number;
-  maxRetries: number;
-}
-
+// ML
 export interface PredictRequest {
   amount: number;
   device: DeviceType;
@@ -130,49 +138,79 @@ export interface ModelMetrics {
   trained_at: string;
 }
 
-// ─── API Functions ──────────────────────────────────────────────────────────
-
-function unwrap<T>(response: { data: { data: T } }): T {
-  return response.data.data;
-}
+// ─── API Functions ───────────────────────────────────────────────────────────
 
 export const api = {
-  // Transactions
-  getTransactions: async (params?: Record<string, unknown>) =>
-    unwrap<{ items: Transaction[]; total: number; page: number; limit: number; totalPages: number }>(
-      await apiClient.get('/transactions', { params })
-    ),
+  // ── Transactions ──
+  getTransactions: async (params?: Record<string, unknown>) => {
+    const res = await apiClient.get<PaginatedResponse<Transaction>>('/transactions', { params });
+    const { data: items, meta } = res.data;
+    return {
+      items: items.map(tx => ({
+        ...tx,
+        amount:    typeof tx.amount    === 'string' ? parseFloat(tx.amount)    : tx.amount,
+        riskScore: typeof tx.riskScore === 'string' ? parseFloat(tx.riskScore) : tx.riskScore,
+      })),
+      total:      meta.total,
+      page:       meta.page,
+      limit:      meta.limit,
+      totalPages: meta.totalPages,
+    };
+  },
 
-  // Analytics
-  getOverview: async (params?: { startDate?: string; endDate?: string }) =>
-    unwrap<OverviewData>(await apiClient.get('/analytics/overview', { params })),
+  getSummary: async () => {
+    const res = await apiClient.get<SummaryData>('/transactions/summary');
+    return res.data;
+  },
 
-  getFailureDistribution: async (params?: { startDate?: string; endDate?: string }) =>
-    unwrap<FailureDistributionItem[]>(await apiClient.get('/analytics/failure-distribution', { params })),
+  // ── Analytics (map backend paths → frontend usage) ──
+  getFailureByReason: async () => {
+    const res = await apiClient.get<FailureByReasonItem[]>('/analytics/failure-by-reason');
+    return res.data;
+  },
 
-  getTimeSeries: async (params?: { granularity?: string; startDate?: string; endDate?: string }) =>
-    unwrap<TimeSeriesItem[]>(await apiClient.get('/analytics/time-series', { params })),
+  getByCountry: async () => {
+    const res = await apiClient.get<DimensionItem[]>('/analytics/failure-by-country');
+    return res.data;
+  },
 
-  getByCountry: async (params?: Record<string, unknown>) =>
-    unwrap<DimensionItem[]>(await apiClient.get('/analytics/by-country', { params })),
+  getByDevice: async () => {
+    const res = await apiClient.get<DimensionItem[]>('/analytics/failure-by-device');
+    return res.data;
+  },
 
-  getByDevice: async (params?: Record<string, unknown>) =>
-    unwrap<DimensionItem[]>(await apiClient.get('/analytics/by-device', { params })),
+  getByPaymentMethod: async () => {
+    const res = await apiClient.get<DimensionItem[]>('/analytics/failure-by-payment-method');
+    return res.data;
+  },
 
-  getByPaymentMethod: async (params?: Record<string, unknown>) =>
-    unwrap<DimensionItem[]>(await apiClient.get('/analytics/by-payment-method', { params })),
+  getDailyTrend: async (days = 30) => {
+    const res = await apiClient.get<DailyTrendItem[]>('/analytics/daily-trend', { params: { days } });
+    return res.data;
+  },
 
-  // Insights
-  getInsights: async () =>
-    unwrap<Insight[]>(await apiClient.get('/insights')),
+  getHourlyPattern: async () => {
+    const res = await apiClient.get<HourlyItem[]>('/analytics/hourly-pattern');
+    return res.data;
+  },
 
-  getFraudFlags: async () =>
-    unwrap<FraudFlag[]>(await apiClient.get('/insights/fraud-flags')),
+  getGatewayPerformance: async () => {
+    const res = await apiClient.get<DimensionItem[]>('/analytics/gateway-performance');
+    return res.data;
+  },
 
-  getRetrySuggestion: async (transactionId: string) =>
-    unwrap<RetrySuggestion>(await apiClient.get(`/insights/retry-suggestion/${transactionId}`)),
+  getRevenueLost: async () => {
+    const res = await apiClient.get<RevenueLost>('/analytics/revenue-lost');
+    return res.data;
+  },
 
-  // ML Service
+  // ── Insights ──
+  getInsights: async () => {
+    const res = await apiClient.get<Insight[]>('/insights');
+    return res.data;
+  },
+
+  // ── ML Service ──
   predict: async (body: PredictRequest): Promise<PredictResponse> =>
     (await mlClient.post('/predict', body)).data,
 

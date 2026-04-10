@@ -80,7 +80,7 @@ export class AnalyticsService {
       .addSelect('COUNT(*)', 'total')
       .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
       .addSelect('SUM(CASE WHEN t.status = \'success\' THEN 1 ELSE 0 END)', 'success')
-      .where('t.created_at >= NOW() - INTERVAL :days DAY', { days: `${days} days` })
+      .where(`t.created_at >= NOW() - make_interval(days => ${days})`)
       .groupBy('DATE(t.created_at)')
       .orderBy('date', 'ASC')
       .getRawMany();
