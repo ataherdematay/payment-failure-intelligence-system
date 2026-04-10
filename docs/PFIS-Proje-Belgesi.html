@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PFIS — Proje Belgesi | Craftgate Sunumu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --ink-faint: #94a3b8;
+      --line: #e2e8f0;
+      --line-soft: #f1f5f9;
+      --accent: #4f46e5;
+      /* indigo */
+      --accent-2: #7c3aed;
+      /* violet */
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --page: #ffffff;
+      --tag-bg: #eef2ff;
+      --tag-text: #4338ca;
+    }
+
+    html {
+      font-size: 15px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--ink);
+      background: #f8fafc;
+      line-height: 1.7;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── Page layout ─────────────────────────────────── */
+    .page-wrap {
+      max-width: 900px;
+      margin: 40px auto 80px;
+      background: var(--page);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .06), 0 20px 40px -8px rgba(0, 0, 0, .10);
+      overflow: hidden;
+    }
+
+    /* ── Cover ───────────────────────────────────────── */
+    .cover {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+      padding: 64px 64px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, .25) 0%, transparent 70%);
+      top: -200px;
+      right: -100px;
+      pointer-events: none;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(167, 139, 250, .15) 0%, transparent 70%);
+      bottom: -80px;
+      left: 50px;
+      pointer-events: none;
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(99, 102, 241, .2);
+      border: 1px solid rgba(99, 102, 241, .4);
+      color: #a5b4fc;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .cover-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #818cf8;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .4;
+      }
+    }
+
+    .cover h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .cover h1 span {
+      background: linear-gradient(90deg, #818cf8, #c4b5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-subtitle {
+      font-size: 15px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .cover-meta-item .label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+    }
+
+    .cover-meta-item .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .cover-stack {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .tech-chip {
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .12);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* ── Body content ────────────────────────────────── */
+    .body {
+      padding: 56px 64px;
+    }
+
+    /* ── Table of contents ───────────────────────────── */
+    .toc {
+      background: var(--line-soft);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 48px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .toc-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ink-muted);
+      margin-bottom: 12px;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 24px;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      font-size: 13px;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .toc li::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    /* ── Section headings ────────────────────────────── */
+    .section {
+      margin-bottom: 52px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.2px;
+    }
+
+    .section-title small {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      margin-top: 1px;
+      letter-spacing: 0;
+    }
+
+    h3.sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 24px 0 10px;
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin-bottom: 12px;
+      line-height: 1.75;
+    }
+
+    /* ── Callout boxes ───────────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .callout.info {
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .callout.success {
+      background: #f0fdf4;
+      border-left: 3px solid #22c55e;
+    }
+
+    .callout.warning {
+      background: #fffbeb;
+      border-left: 3px solid #f59e0b;
+    }
+
+    .callout.accent {
+      background: #eef2ff;
+      border-left: 3px solid var(--accent);
+    }
+
+    .callout .icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .callout .text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+    }
+
+    .callout .text strong {
+      color: var(--ink);
+    }
+
+    /* ── Tables ──────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: var(--ink);
+      color: white;
+    }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--line);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--line-soft);
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      color: var(--ink-soft);
+      vertical-align: top;
+    }
+
+    td code,
+    th code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* ── Lists ───────────────────────────────────────── */
+    ul.styled,
+    ol.styled {
+      padding-left: 0;
+      list-style: none;
+      margin: 12px 0 20px;
+    }
+
+    ul.styled li {
+      padding: 5px 0 5px 22px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      position: relative;
+      line-height: 1.6;
+    }
+
+    ul.styled li::before {
+      content: '›';
+      position: absolute;
+      left: 6px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    ol.styled {
+      counter-reset: steps;
+    }
+
+    ol.styled li {
+      counter-increment: steps;
+      padding: 8px 0 8px 36px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      position: relative;
+      border-bottom: 1px solid var(--line-soft);
+      line-height: 1.6;
+    }
+
+    ol.styled li::before {
+      content: counter(steps);
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Code block ──────────────────────────────────── */
+    .code-block {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 16px 0 24px;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
+    .code-block .kw {
+      color: #c084fc;
+    }
+
+    .code-block .str {
+      color: #86efac;
+    }
+
+    .code-block .cmd {
+      color: #67e8f9;
+    }
+
+    .code-block .cmt {
+      color: #475569;
+    }
+
+    .code-block .num {
+      color: #fbbf24;
+    }
+
+    /* ── Feature cards ───────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0 24px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .feature-card .fc-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .feature-card .fc-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .feature-card .fc-desc {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.55;
+    }
+
+    /* ── Architecture diagram (text) ─────────────────── */
+    .arch-box {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 28px;
+      margin: 16px 0 24px;
+    }
+
+    .arch-box pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.8;
+    }
+
+    .arch-box .node {
+      color: #93c5fd;
+    }
+
+    .arch-box .arrow {
+      color: #4ade80;
+    }
+
+    .arch-box .port {
+      color: #fbbf24;
+    }
+
+    .arch-box .title {
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    /* ── Timeline / Phase list ───────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+      margin: 16px 0 24px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent-2));
+      border-radius: 2px;
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .tl-item .tl-phase {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+
+    .tl-item .tl-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .tl-item .tl-desc {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .tl-done .tl-item::before {
+      background: var(--success);
+      box-shadow: 0 0 0 2px var(--success);
+    }
+
+    .tl-done .tl-phase {
+      color: var(--success);
+    }
+
+    /* ── KPI row ─────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 16px 0 24px;
+    }
+
+    .kpi-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .kpi-card .kpi-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 4px;
+    }
+
+    .kpi-card .kpi-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+
+    /* ── Badge tags ──────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+    }
+
+    .badge.green {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge.yellow {
+      background: #fef9c3;
+      color: #a16207;
+    }
+
+    .badge.red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.gray {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* ── Endpoint row ────────────────────────────────── */
+    .endpoint-method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .method-get {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .method-post {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    /* ── Divider ─────────────────────────────────────── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 36px 0;
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
+    .doc-footer {
+      background: #0f172a;
+      padding: 28px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-footer .left {
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .doc-footer .left strong {
+      color: #94a3b8;
+    }
+
+    .doc-footer .right {
+      color: #334155;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Print ───────────────────────────────────────── */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page-wrap {
+        max-width: 100%;
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .section {
+        break-inside: avoid;
+      }
+
+      .cover {
+        break-after: page;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page-wrap">
+
+    <!-- ══════════════════════════════════════════════════════
+       COVER PAGE
+  ══════════════════════════════════════════════════════ -->
+    <div class="cover">
+      <div class="cover-badge">
+        <span class="dot"></span>
+        Proje Tanıtım Belgesi &nbsp;·&nbsp; v1.0
+      </div>
+
+      <h1>Payment Failure<br /><span>Intelligence System</span></h1>
+      <p class="cover-subtitle">
+        Ödeme başarısızlıklarını sınıflandıran, analiz eden ve optimize eden<br />
+        çok katmanlı bir yapay zeka destekli fintech platformu.
+      </p>
+
+      <div class="cover-stack">
+        <span class="tech-chip">Next.js 16</span>
+        <span class="tech-chip">NestJS</span>
+        <span class="tech-chip">FastAPI</span>
+        <span class="tech-chip">PostgreSQL</span>
+        <span class="tech-chip">scikit-learn</span>
+        <span class="tech-chip">TypeScript</span>
+        <span class="tech-chip">Python 3.11</span>
+        <span class="tech-chip">TanStack Query</span>
+        <span class="tech-chip">Recharts</span>
+      </div>
+
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <span class="label">Proje Türü</span>
+          <span class="value">Portfolyo / Teknik Demo</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="label">Hazırlayan</span>
+          <span class="value">Ata Herdem Atay</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="label">Tarih</span>
+          <span class="value">Nisan 2026</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="label">GitHub</span>
+          <span class="value">ataherdematay/payment-failure-intelligence-system</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="label">Sunum</span>
+          <span class="value">Craftgate Teknoloji A.Ş.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+       BODY
+  ══════════════════════════════════════════════════════ -->
+    <div class="body">
+
+      <!-- TOC -->
+      <div class="toc">
+        <div class="toc-title">İçindekiler</div>
+        <ol>
+          <li>Projenin Amacı ve Motivasyonu</li>
+          <li>Hedeflenen Kullanıcı Kitlesi</li>
+          <li>Sistem Mimarisi</li>
+          <li>Geliştirme Aşamaları</li>
+          <li>Dashboard Sayfaları ve Kullanım</li>
+          <li>Makine Öğrenmesi Sistemi</li>
+          <li>Backend API Referansı</li>
+          <li>Veri Yapısı ve Sentetik Veri</li>
+          <li>Kurulum ve Çalıştırma</li>
+          <li>Craftgate ile İlişkisi</li>
+        </ol>
+      </div>
+
+      <!-- ─── 1. AMAÇ ────────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">01</div>
+          <div class="section-title">
+            Projenin Amacı ve Motivasyonu
+            <small>Neden bu sistem inşa edildi?</small>
+          </div>
+        </div>
+
+        <p>
+          PFIS (Payment Failure Intelligence System), online ödeme işlemlerindeki
+          başarısızlıkları <strong>analiz eden, sınıflandıran ve optimize eden</strong>
+          bir yapay zeka destekli karar destek sistemidir.
+        </p>
+
+        <div class="callout accent">
+          <span class="icon">🎯</span>
+          <div class="text">
+            <strong>Temel Problem:</strong> Ödeme orkestrasyon platformları binlerce işlemi
+            saniyeler içinde farklı sanal POS sağlayıcılardan geçirir. Her başarısız işlem
+            hem müşteri deneyimini hem de işletme gelirini doğrudan etkiler. Ancak pek çok
+            firmada bu başarısızlıkların <em>neden</em> gerçekleştiği bilinmez, gateway'lerin
+            birbirine göre performansı ölçülmez ve önlem alınması reaktiftir.
+          </div>
+        </div>
+
+        <p>
+          Bu sistem, ödeme verilerini canlı olarak izleyen, başarısızlık nedenlerini
+          makine öğrenmesiyle tahmin eden, otomatik içgörüler üreten ve iş kararlarını
+          simüle eden eksiksiz bir platform sunmaktadır.
+        </p>
+
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-value">10K</div>
+            <div class="kpi-label">İşlem Verisi</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">%82</div>
+            <div class="kpi-label">ML Doğruluğu</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">5</div>
+            <div class="kpi-label">Başarısızlık Sınıfı</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">3</div>
+            <div class="kpi-label">Bağımsız Servis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 2. KULLANICI KİTLESİ ──────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">02</div>
+          <div class="section-title">
+            Hedeflenen Kullanıcı Kitlesi
+            <small>Bu sistemden kim yararlanır?</small>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="fc-icon">🏦</div>
+            <div class="fc-title">Ödeme Orkestrasyon Firmaları</div>
+            <div class="fc-desc">
+              Craftgate gibi çok sağlayıcılı ödeme altyapıları. Gateway başarım karşılaştırması,
+              akıllı yönlendirme kararları ve retry optimizasyonu.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">🛒</div>
+            <div class="fc-title">E-Ticaret İşletmeleri</div>
+            <div class="fc-desc">
+              Hangi ödeme yönteminin daha çok başarısızlığa yol açtığını, hangi ülkede / cihazda
+              sorun yaşandığını takip etmek isteyen merchant'lar.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">📊</div>
+            <div class="fc-title">Risk & Analitik Ekipleri</div>
+            <div class="fc-desc">
+              İşlem desenlerini inceleyerek fraud riskini erken tespit etmek, revenue-at-risk
+              raporlaması yapmak isteyen ekipler.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">🔧</div>
+            <div class="fc-title">Platform Mühendisleri</div>
+            <div class="fc-desc">
+              Mevcut sistemlerine entegre edebilecekleri REST API'lere ve ML tahmin
+              endpoint'lerine ihtiyaç duyan geliştirici ekipleri.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 3. MİMARİ ─────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">03</div>
+          <div class="section-title">
+            Sistem Mimarisi
+            <small>Üç bağımsız servis, tek bütünleşik platform</small>
+          </div>
+        </div>
+
+        <p>
+          PFIS, birbirinden bağımsız çalışabilen ama birlikte entegre olan üç servis
+          katmanından oluşmaktadır:
+        </p>
+
+        <div class="arch-box">
+          <pre>
+<span class="title">PFIS — Servis Mimarisi</span>
+
+                      <span class="node">┌─────────────────────┐</span>
+    Kullanıcı ───────▶ <span class="node">│   Next.js Frontend  │</span>   <span class="port">:3000</span>
+                      <span class="node">│  Dashboard / UI      │</span>
+                      <span class="node">└──────────┬──────────┘</span>
+                                 <span class="arrow">│ REST API</span>
+                      <span class="node">┌──────────▼──────────┐</span>
+                      <span class="node">│   NestJS Backend    │</span>   <span class="port">:3001</span>
+                      <span class="node">│  Analitik / Insight  │</span>
+                      <span class="node">└────────┬───┬────────┘</span>
+                               <span class="arrow">│</span>   <span class="arrow">│ /ml/*</span>
+              <span class="node">┌────────────┘</span>   <span class="node">└──────────────┐</span>
+     <span class="node">┌─────────▼────────┐</span>         <span class="node">┌────▼──────────────┐</span>
+     <span class="node">│   PostgreSQL     │</span>         <span class="node">│  FastAPI ML Svc   │</span>  <span class="port">:8000</span>
+     <span class="node">│   :5432          │</span>         <span class="node">│  RandomForest     │</span>
+     <span class="node">└──────────────────┘</span>         <span class="node">└───────────────────┘</span>
+              <span class="arrow">▲</span>
+     <span class="node">┌────────┴─────────┐</span>
+     <span class="node">│  Data Generator  │</span>  Python — 10.000 sentetik işlem seed'leme
+     <span class="node">└──────────────────┘</span>
+        </pre>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Katman</th>
+                <th>Teknoloji</th>
+                <th>Sorumluluk</th>
+                <th>Port</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Frontend</strong></td>
+                <td>Next.js 16, TanStack Query, Recharts</td>
+                <td>Dashboard görselleştirme, kullanıcı etkileşimi</td>
+                <td><code>:3000</code></td>
+              </tr>
+              <tr>
+                <td><strong>Backend</strong></td>
+                <td>NestJS, TypeORM, PostgreSQL, Swagger</td>
+                <td>REST API, analitik sorgular, insight üretimi</td>
+                <td><code>:3001</code></td>
+              </tr>
+              <tr>
+                <td><strong>ML Service</strong></td>
+                <td>FastAPI, scikit-learn, Pydantic</td>
+                <td>RandomForest tahmin, model metrikleri</td>
+                <td><code>:8000</code></td>
+              </tr>
+              <tr>
+                <td><strong>Veritabanı</strong></td>
+                <td>PostgreSQL 16</td>
+                <td>İşlem kayıtları, kalıcı depolama</td>
+                <td><code>:5432</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout info">
+          <span class="icon">ℹ️</span>
+          <div class="text">
+            <strong>Mimari Karar:</strong> ML servisi, NestJS backend'inden ayrı bir
+            microservice olarak tasarlanmıştır. Böylece model güncellemeleri backend'e
+            dokunmadan gerçekleştirilebilir. Backend, frontend'den gelen ML isteklerini
+            proxy olarak FastAPI'ye iletir.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 4. AŞAMALAR ───────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">04</div>
+          <div class="section-title">
+            Geliştirme Aşamaları
+            <small>Projenin chronolojik inşa süreci</small>
+          </div>
+        </div>
+
+        <div class="timeline tl-done">
+          <div class="tl-item">
+            <div class="tl-phase">Faz 1 — Temel Altyapı</div>
+            <div class="tl-title">Veri Modeli ve Veritabanı</div>
+            <div class="tl-desc">
+              Ödeme işlemlerini temsil eden veri şeması tasarlandı. <code>transactions</code>
+              tablosu; işlem tutarı, ödeme yöntemi, ülke, cihaz, gateway, başarı/başarısızlık
+              durumu ve başarısızlık nedeni alanlarını içermektedir. Python ile 10.000 adet
+              gerçekçi sentetik işlem üretildi ve PostgreSQL'e seed edildi.
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 2 — Backend API</div>
+            <div class="tl-title">NestJS REST API ve Analitik Modüller</div>
+            <div class="tl-desc">
+              NestJS çatısıyla <em>Clean Architecture</em> prensiplerine uygun servis katmanları
+              kuruldu. Transactions, Analytics, Insights ve ML proxy modülleri yazıldı.
+              Swagger UI entegre edildi (<code>:3001/api/docs</code>). PostgreSQL için
+              TypeORM ile migration tabanlı şema yönetimi sağlandı. Kritik SQL sözdizimi
+              hatası (<code>make_interval</code>) belirlenerek düzeltildi.
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 3 — ML Servisi</div>
+            <div class="tl-title">RandomForest Başarısızlık Sınıflandırıcı</div>
+            <div class="tl-desc">
+              FastAPI üzerinde bağımsız bir ML microservice inşa edildi. scikit-learn
+              ile RandomForestClassifier eğitildi; 5 sınıf (insufficient_funds,
+              network_error, fraud_suspected, expired_card, invalid_credentials) için
+              %82 doğruluk elde edildi. Model joblib ile serialize edilerek kalıcı
+              hale getirildi. <code>/predict</code> ve <code>/model/metrics</code>
+              endpoint'leri hazırlandı.
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 4 — Frontend Dashboard</div>
+            <div class="tl-title">5 Sayfalık Gerçek Zamanlı Dashboard</div>
+            <div class="tl-desc">
+              Next.js 16 App Router ile 5 sayfalı dashboard tamamlandı. TanStack Query
+              ile tüm API çağrıları cache edildi. Recharts entegrasyonuyla area, bar,
+              pie ve composed chart'lar eklendi. Typed API client (<code>lib/api.ts</code>)
+              yeniden yazılarak NestJS ve FastAPI response şemaları eşleştirildi.
+              Glassmorphism temalı koyu renk tasarım sistemi oluşturuldu.
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 5 — Craftgate Entegrasyonu</div>
+            <div class="tl-title">Sektöre Özel Hikaye ve Preset Senaryolar</div>
+            <div class="tl-desc">
+              README tam anlamıyla Craftgate odaklı yeniden yazıldı. Simulation sayfasına
+              Craftgate ürünlerine doğrudan atıfla 4 preset senaryo eklendi:
+              "Drop Square Gateway", "Retry Autopilot ON", "Peak Season", "Current State".
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 5. DASHBOARD SAYFALARI ────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">05</div>
+          <div class="section-title">
+            Dashboard Sayfaları ve Kullanım Kılavuzu
+            <small>Her sayfanın amacı ve nasıl kullanıldığı</small>
+          </div>
+        </div>
+
+        <!-- Overview -->
+        <h3 class="sub">📊 Overview — Ana Sayfa</h3>
+        <p>
+          Dashboard'a girildiğinde ilk karşılaşılan sayfadır. Sistemin genel sağlığını
+          tek bakışta sunar.
+        </p>
+        <div class="callout success">
+          <span class="icon">🖥️</span>
+          <div class="text">
+            <strong>Ne gösterir?</strong><br />
+            4 KPI kartı: toplam işlem sayısı, başarısızlık oranı, kayıp gelir, ortalama risk skoru.<br />
+            Başarısızlık dağılımı donut chart (5 neden bazında).<br />
+            30 günlük başarılı/başarısız işlem trendi (area chart).<br />
+            Cihaz bazlı ve ülke bazlı başarısızlık oranları (bar chart).<br />
+            Son 10 işlemin filtrelenebilir tablosu.
+          </div>
+        </div>
+
+        <!-- Analytics -->
+        <h3 class="sub">📈 Analytics — Detaylı Analiz</h3>
+        <p>
+          Ödeme başarımının operasyonel ve stratejik düzeyde incelenmesine olanak tanır.
+        </p>
+        <div class="callout success">
+          <span class="icon">🖥️</span>
+          <div class="text">
+            <strong>Ne gösterir?</strong><br />
+            Günlük işlem hacmi trendi (success/failed stacked area).<br />
+            Ödeme yöntemi bazlı başarısızlık oranı (bar chart).<br />
+            24 saatlik eğilim — hangi saatte daha çok başarısızlık oluşuyor?<br />
+            Gateway performans karşılaştırması (Square: %39.1 vs Stripe: %28.3 gibi).<br />
+            Durum ve nedene göre filtrelenebilir, sayfalandırılmış işlem tablosu.
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <h3 class="sub">💡 Insights — Yapay Zeka İçgörüleri</h3>
+        <p>
+          Sistemin veriyi analiz ederek otomatik olarak ürettiği önceliklendirilmiş
+          iş önerileridir. Manuel rapor hazırlamaya gerek kalmaz.
+        </p>
+        <div class="callout warning">
+          <span class="icon">🖥️</span>
+          <div class="text">
+            <strong>Kart türleri:</strong><br />
+            🔴 <strong>CRITICAL</strong> — Genel başarısızlık oranı %15 sektör ortalamasının üzerinde.<br />
+            🟡 <strong>WARNING</strong> — Belirli bir gateway veya ülke ortalamanın 2 katı başarısızlık
+            gösteriyor.<br />
+            🔵 <strong>INFO</strong> — Gece saatlerinde anormal yoğunlaşma, cihaz bazlı desen.
+          </div>
+        </div>
+
+        <!-- Predictions -->
+        <h3 class="sub">🤖 Predictions — ML Tahmin Motoru</h3>
+        <p>
+          Belirli bir işlem profili için hangi nedenle başarısız olacağını tahmin eder.
+          Risk değerlendirmesi ve proaktif önlem için kullanılır.
+        </p>
+        <div class="callout info">
+          <span class="icon">🖥️</span>
+          <div class="text">
+            <strong>Nasıl kullanılır?</strong><br />
+            Form alanlarını doldur: cihaz, ülke, tutar aralığı, gün, saat.<br />
+            "Predict" butonuna tıkla → ML modeli tahminini ve güven skorunu döner.<br />
+            Her sınıf için olasılık barları görüntülenir.<br />
+            Sağda model metrikleri paneli: genel doğruluk, F1 skoru, sınıf bazlı performans.
+          </div>
+        </div>
+
+        <!-- Simulation -->
+        <h3 class="sub">🔬 Simulation — Senaryo Simülatörü</h3>
+        <p>
+          İş parametrelerinin değiştirildiğinde başarısızlık ve gelir üzerindeki etkisini
+          modeller. "What-if" analizlerine olanak tanır.
+        </p>
+        <div class="callout accent">
+          <span class="icon">🖥️</span>
+          <div class="text">
+            <strong>Parametreler:</strong> Aylık işlem hacmi · Temel başarısızlık oranı · Ortalama tutar · Mobil trafik
+            payı · Ağ güvenilirliği · Fraud hassasiyeti · Retry on/off · Retry başarı oranı.<br /><br />
+            <strong>Craftgate Preset'leri (tek tıkla yükle):</strong><br />
+            📊 Current State — Mevcut baseline<br />
+            🔀 Drop Square Gateway — Square kaldırılınca oran %24.1'e düşüyor<br />
+            🔄 Retry Autopilot ON — %55 retry başarı ile $26.100 gelir kurtarımı<br />
+            📈 Peak Season — 100K işlem Black Friday senaryosu
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 6. ML ───────────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">06</div>
+          <div class="section-title">
+            Makine Öğrenmesi Sistemi
+            <small>Model tasarımı, eğitim ve değerlendirme</small>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Parametre</th>
+                <th>Değer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Algoritma</td>
+                <td>RandomForestClassifier (scikit-learn)</td>
+              </tr>
+              <tr>
+                <td>Eğitim veri seti</td>
+                <td>3.765 başarısız işlem (10K içinden)</td>
+              </tr>
+              <tr>
+                <td>Test seti oranı</td>
+                <td>%20</td>
+              </tr>
+              <tr>
+                <td>Özellikler (features)</td>
+                <td>amount, device_type, country, payment_method, hour_of_day, day_of_week</td>
+              </tr>
+              <tr>
+                <td>Hedef (target)</td>
+                <td>failure_reason (5 sınıf)</td>
+              </tr>
+              <tr>
+                <td>Genel doğruluk</td>
+                <td>~%82</td>
+              </tr>
+              <tr>
+                <td>Model dosyası</td>
+                <td><code>ml-service/models/model.joblib</code></td>
+              </tr>
+              <tr>
+                <td>Yeniden eğitim</td>
+                <td><code>POST /model/retrain</code> endpoint'i ile</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">Başarısızlık Sınıfları</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sınıf</th>
+                <th>Açıklama</th>
+                <th>Simge</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>insufficient_funds</code></td>
+                <td>Yetersiz bakiye / kart limiti aşımı</td>
+                <td><span class="badge red">Kritik</span></td>
+              </tr>
+              <tr>
+                <td><code>network_error</code></td>
+                <td>Gateway veya ağ bağlantı hatası</td>
+                <td><span class="badge yellow">Geçici</span></td>
+              </tr>
+              <tr>
+                <td><code>fraud_suspected</code></td>
+                <td>Kural tabanlı fraud tespiti</td>
+                <td><span class="badge red">Risk</span></td>
+              </tr>
+              <tr>
+                <td><code>expired_card</code></td>
+                <td>Süresi dolmuş kart bilgisi</td>
+                <td><span class="badge yellow">Tekrar Dene</span></td>
+              </tr>
+              <tr>
+                <td><code>invalid_credentials</code></td>
+                <td>Hatalı kart / CVC / 3DS</td>
+                <td><span class="badge gray">Kullanıcı Hatası</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout info">
+          <span class="icon">💡</span>
+          <div class="text">
+            <strong>Retry Stratejisi:</strong> Sınıflandırıcı sonucuna göre
+            <code>network_error</code> ve <code>expired_card</code> sınıfları
+            "retry edilebilir" olarak işaretlenir. Bu, simulation sayfasındaki
+            gelir kurtarım hesabının temelidir.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 7. API REFERANSI ──────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">07</div>
+          <div class="section-title">
+            Backend API Referansı
+            <small>NestJS :3001 ve FastAPI :8000</small>
+          </div>
+        </div>
+
+        <h3 class="sub">NestJS Backend — /api/v1</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/transactions</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Filtrelenebilir, sayfalandırılmış işlem listesi</td>
+              </tr>
+              <tr>
+                <td><code>/transactions/summary</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>KPI özeti: toplam, başarısız, oran, risk</td>
+              </tr>
+              <tr>
+                <td><code>/analytics/failure-by-reason</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Neden bazlı başarısızlık dağılımı</td>
+              </tr>
+              <tr>
+                <td><code>/analytics/daily-trend</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Son N günlük günlük işlem trendi</td>
+              </tr>
+              <tr>
+                <td><code>/analytics/gateway-performance</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Gateway bazlı başarısızlık oranı ve hacim</td>
+              </tr>
+              <tr>
+                <td><code>/analytics/hourly-pattern</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>24 saatlik saat bazlı desen</td>
+              </tr>
+              <tr>
+                <td><code>/insights</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Otomatik üretilen içgörü kartları</td>
+              </tr>
+              <tr>
+                <td><code>/ml/predict</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td>FastAPI ML servisine proxy tahmin isteği</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">FastAPI ML Service — :8000</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/health</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Model yüklü mü, servis sağlıklı mı?</td>
+              </tr>
+              <tr>
+                <td><code>/predict</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td>Başarısızlık nedeni tahmini + güven skoru</td>
+              </tr>
+              <tr>
+                <td><code>/model/metrics</code></td>
+                <td><span class="endpoint-method method-get">GET</span></td>
+                <td>Doğruluk, F1, sınıf bazlı precision/recall</td>
+              </tr>
+              <tr>
+                <td><code>/model/retrain</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td>Modeli yeniden eğit (güncel DB verisine göre)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── 8. VERİ ────────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">08</div>
+          <div class="section-title">
+            Veri Yapısı ve Sentetik Veri Üretimi
+            <small>İşlem modeli ve test verisi nasıl oluşturuldu?</small>
+          </div>
+        </div>
+
+        <p>
+          Gerçek üretim verisi bulunmadığından, Craftgate ödeme ekosistemini temsil etmek
+          amacıyla Python ile 10.000 adet sentetik işlem kaydı üretilmiştir.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Alan</th>
+                <th>Tür</th>
+                <th>Örnek Değerler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>id</code></td>
+                <td>UUID</td>
+                <td>550e8400-e29b-41d4…</td>
+              </tr>
+              <tr>
+                <td><code>amount</code></td>
+                <td>decimal</td>
+                <td>49.99 – 4999.99</td>
+              </tr>
+              <tr>
+                <td><code>status</code></td>
+                <td>enum</td>
+                <td>success / failed</td>
+              </tr>
+              <tr>
+                <td><code>failure_reason</code></td>
+                <td>enum</td>
+                <td>5 sınıf (bkz. Bölüm 6)</td>
+              </tr>
+              <tr>
+                <td><code>payment_method</code></td>
+                <td>string</td>
+                <td>credit_card, bank_transfer, digital_wallet</td>
+              </tr>
+              <tr>
+                <td><code>gateway</code></td>
+                <td>string</td>
+                <td>stripe, square, adyen, braintree, paypal</td>
+              </tr>
+              <tr>
+                <td><code>country</code></td>
+                <td>ISO-2</td>
+                <td>TR, US, DE, GB, FR…</td>
+              </tr>
+              <tr>
+                <td><code>device_type</code></td>
+                <td>string</td>
+                <td>mobile, desktop, tablet</td>
+              </tr>
+              <tr>
+                <td><code>risk_score</code></td>
+                <td>float [0-1]</td>
+                <td>0.12 – 0.94</td>
+              </tr>
+              <tr>
+                <td><code>created_at</code></td>
+                <td>timestamp</td>
+                <td>Son 90 gün içinde dağılımlı</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout warning">
+          <span class="icon">⚠️</span>
+          <div class="text">
+            <strong>Veri Gerçekçiliği:</strong> Sentetik veri, gerçek ödeme ekosistemindeki
+            dağılımları modellemiştir: %37 başarısızlık oranı, mobil'de daha yüksek hata oranı,
+            gece saatlerinde fraud yoğunluğu, gateway bazlı farklı hata profilleri.
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 9. KURULUM ────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">09</div>
+          <div class="section-title">
+            Kurulum ve Çalıştırma
+            <small>Sıfırdan sistemi ayağa kaldırma adımları</small>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <span class="icon">📋</span>
+          <div class="text">
+            <strong>Gereksinimler:</strong> Node.js 20+ · Python 3.9+ · PostgreSQL 16+ (Homebrew:
+            <code>brew install postgresql@16</code>)
+          </div>
+        </div>
+
+        <h3 class="sub">1 — Veritabanı Oluşturma</h3>
+        <div class="code-block">
+          <pre><span class="cmt"># PostgreSQL başlat</span>
+<span class="cmd">brew services start</span> postgresql@16
+<span class="cmd">createdb</span> pfis_db
+<span class="cmd">psql</span> postgres -c <span class="str">"CREATE USER pfis WITH PASSWORD 'pfis_secret_2026';"</span>
+<span class="cmd">psql</span> postgres -c <span class="str">"ALTER DATABASE pfis_db OWNER TO pfis;"</span></pre>
+        </div>
+
+        <h3 class="sub">2 — Sentetik Veri Üretme ve Seed</h3>
+        <div class="code-block">
+          <pre><span class="cmd">cd</span> data-generator
+<span class="cmd">python3 -m venv</span> venv <span class="cmt">&amp;&amp;</span> <span class="cmd">source</span> venv/bin/activate
+<span class="cmd">pip install -r</span> requirements.txt
+<span class="cmd">python</span> generate.py --count <span class="num">10000</span> --output csv
+<span class="cmd">python</span> seed_db.py</pre>
+        </div>
+
+        <h3 class="sub">3 — Backend (Terminal 1)</h3>
+        <div class="code-block">
+          <pre><span class="cmd">cd</span> backend
+<span class="cmd">cp</span> .env.example .env   <span class="cmt"># DB bilgilerini düzenle</span>
+<span class="cmd">npm install</span>
+<span class="cmd">npm run start:dev</span>      <span class="cmt"># → http://localhost:3001/api/docs</span></pre>
+        </div>
+
+        <h3 class="sub">4 — ML Servisi (Terminal 2)</h3>
+        <div class="code-block">
+          <pre><span class="cmd">cd</span> ml-service
+<span class="cmd">python3 -m venv</span> venv <span class="cmt">&amp;&amp;</span> <span class="cmd">source</span> venv/bin/activate
+<span class="cmd">pip install -r</span> requirements.txt
+<span class="cmd">python -m app.train</span>    <span class="cmt"># RandomForest modelini eğit</span>
+<span class="cmd">uvicorn</span> app.main:app --reload --port <span class="num">8000</span></pre>
+        </div>
+
+        <h3 class="sub">5 — Frontend (Terminal 3)</h3>
+        <div class="code-block">
+          <pre><span class="cmd">cd</span> frontend
+<span class="cmd">cp</span> .env.local.example .env.local
+<span class="cmd">npm install</span>
+<span class="cmd">npm run dev</span>            <span class="cmt"># → http://localhost:3000</span></pre>
+        </div>
+      </div>
+
+      <!-- ─── 10. CRAFTGATE ─────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">10</div>
+          <div class="section-title">
+            Craftgate ile İlişkisi
+            <small>Bu projenin Craftgate'in iş problemleriyle örtüşmesi</small>
+          </div>
+        </div>
+
+        <p>
+          Craftgate, Türkiye'nin lider ödeme orkestrasyon platformudur. 500+ üye işyeri,
+          %99.99 uptime ve 2025'te 1.19 milyar ₺ kurtarılan gelir ile ödeme altyapısında
+          kritik bir konum tutmaktadır. PFIS'in tasarımı bu gerçek dünya problemleri
+          dikkate alınarak yapılmıştır:
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Craftgate Ürünü</th>
+                <th>PFIS Karşılığı</th>
+                <th>Değer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Autopilot & Ödeme Tekrar Deneme</strong></td>
+                <td>Simulation → "Retry Autopilot ON" preset'i</td>
+                <td>Retry başarı oranının gelir kurtarıma etkisini modellemek</td>
+              </tr>
+              <tr>
+                <td><strong>Akıllı ve Dinamik Ödeme Yönlendirme</strong></td>
+                <td>Analytics → Gateway Performans grafiği</td>
+                <td>Hangi gateway'in yüksek başarısızlık ürettiğini görmek; yönlendirme kararı vermek</td>
+              </tr>
+              <tr>
+                <td><strong>Gelişmiş Üye İşyeri Paneli</strong></td>
+                <td>Overview + Analytics sayfaları</td>
+                <td>İşletmenin ödeme sağlığını gerçek zamanlı izlemek</td>
+              </tr>
+              <tr>
+                <td><strong>Fraud & Risk Değerlendirme</strong></td>
+                <td>ML Predictions + Insights kritik uyarıları</td>
+                <td>Şüpheli işlemleri fatura edilmeden önce sınıflandırmak</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout accent">
+          <span class="icon">🔀</span>
+          <div class="text">
+            <strong>Örnek İş Senaryosu — "Drop Square Gateway":</strong><br />
+            Analytics sayfasında Square gateway'inin %39.1 başarısızlık oranıyla
+            diğer gateway'lerin (%25-29) çok üzerinde olduğu tespit edilir. Insights
+            sayfası bunu <strong>WARNING</strong> kart olarak raporlar. Simulation
+            sayfasında "Drop Square Gateway" preset'i seçildiğinde başarısızlık oranının
+            %31 → %24.1'e, kayıp gelirin $465K → $360K'ya düştüğü anlık hesaplanır.
+            Bu, tam olarak Craftgate'in <em>Akıllı Routing</em> ürününün müşterilere
+            kazandırdığı değerdir.
+          </div>
+        </div>
+
+        <h3 class="sub">Teknik Beceri Örtüşmesi</h3>
+        <ul class="styled">
+          <li><strong>Backend:</strong> NestJS ile modüler, SOLID prensipli REST API — Craftgate backend stack'ine
+            (Java/Spring) analoji kurulabilir temiz mimari</li>
+          <li><strong>Frontend:</strong> Next.js + TanStack Query + TypeScript — Craftgate Frontend Developer ilanında
+            istenen stack ile birebir örtüşme</li>
+          <li><strong>DevOps Kültürü:</strong> Backend/frontend ayrımı yok; tam-yığın geliştirici yaklaşımı —
+            Craftgate'in ürün ekibi modeli</li>
+          <li><strong>Domain Bilgisi:</strong> Ödeme terminolojisi (gateway, retry, fraud, chargeback), POS
+            entegrasyonu, başarısızlık sınıflandırması</li>
+          <li><strong>Veri Odaklı:</strong> Analitik sorgular, ML pipeline, insight üretimi — veriyi karar desteğine
+            dönüştürme</li>
+        </ul>
+      </div>
+
+      <hr />
+
+      <div class="callout success">
+        <span class="icon">✅</span>
+        <div class="text">
+          <strong>Projenin GitHub Adresi:</strong><br />
+          <code>https://github.com/ataherdematay/payment-failure-intelligence-system</code><br /><br />
+          Tüm kaynak kod, API dokümantasyonu (Swagger), ML eğitim scripti ve
+          veri üretici bu repoda eksiksiz yer almaktadır.
+        </div>
+      </div>
+
+    </div><!-- /body -->
+
+    <!-- Footer -->
+    <div class="doc-footer">
+      <div class="left">
+        <strong>Payment Failure Intelligence System</strong> — Proje Belgesi v1.0<br />
+        Ata Herdem Atay · Nisan 2026 · Craftgate Teknoloji A.Ş. Sunumu
+      </div>
+      <div class="right">PFIS · github/ataherdematay</div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+</body>
+
+</html>
