@@ -11,8 +11,9 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
 
+  const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: corsOrigin === '*' || !corsOrigin ? true : corsOrigin,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
@@ -30,9 +31,9 @@ async function bootstrap() {
     .build();
   SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, config));
 
-  const port = process.env.BACKEND_PORT || 3001;
+  const port = process.env.PORT || process.env.BACKEND_PORT || 3001;
   await app.listen(port);
   logger.log(`🚀 PFIS Backend → http://localhost:${port}`);
-  logger.log(`�� Swagger      → http://localhost:${port}/api/docs`);
+  logger.log(`📄 Swagger      → http://localhost:${port}/api/docs`);
 }
 bootstrap();
