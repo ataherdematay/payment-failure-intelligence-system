@@ -1,21 +1,11 @@
 #!/bin/bash
 # Railway startup script for ML service
-# Trains the model if not already present, then starts the server
-
-set -e
-
-MODEL_PATH="models/latest_model.joblib"
+# Model training is NOT done on startup — use POST /model/retrain endpoint instead
+# The service starts and serves /health immediately; /predict returns 503 until trained.
 
 echo "🚀 PFIS ML Service startup..."
-
-# Check if a real model exists (not just a placeholder)
-if [ ! -f "$MODEL_PATH" ] || [ $(wc -c < "$MODEL_PATH") -lt 1000 ]; then
-    echo "⚠️  No trained model found. Starting initial training..."
-    python -m app.train
-    echo "✅ Model training complete."
-else
-    echo "✅ Model found, skipping training."
-fi
-
-echo "🌐 Starting FastAPI server..."
+echo "ℹ️  No model pre-training on startup."
+echo "   → Use POST /model/retrain after seeding the database."
+echo ""
+echo "🌐 Starting FastAPI server on port ${PORT:-8000}..."
 exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}"
