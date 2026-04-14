@@ -182,8 +182,8 @@ export default function InsightsPage() {
                     marginBottom: 10,
                   }}>
                     <span className="mono" style={{ fontSize: 13, fontWeight: 700, color }}>
-                      {typeof insight.metric === 'object'
-                        ? `${insight.metric.value}${insight.metric.unit}`
+                      {typeof (insight.metric as unknown) === 'object'
+                        ? `${((insight.metric as unknown) as { value: string; unit: string }).value}${((insight.metric as unknown) as { value: string; unit: string }).unit}`
                         : insight.metric}
                     </span>
                   </div>

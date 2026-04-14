@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
               <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} tickFormatter={v => `${v}%`} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} width={80} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']} />
+                formatter={(v) => [`${v}%`, 'Failure Rate']} />
               <Bar dataKey="failureRate" fill="#14b8a6" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
               <XAxis dataKey="hour" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} tickLine={false} interval={2} />
               <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} tickFormatter={v => `${v}%`} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']} />
+                formatter={(v) => [`${v}%`, 'Failure Rate']} />
               <Bar dataKey="failureRate" radius={[3, 3, 0, 0]}
                 fill="#8b5cf6"
               />
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} tickFormatter={v => `${v}%`} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']} />
+                formatter={(v) => [`${v}%`, 'Failure Rate']} />
               <Bar dataKey="failureRate" fill="#f59e0b" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

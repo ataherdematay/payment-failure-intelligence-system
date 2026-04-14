@@ -67,6 +67,7 @@ export interface FailureByReasonItem {
 }
 
 export interface DimensionItem {
+  name?: string;
   country?: string;
   device?: string;
   paymentMethod?: string;

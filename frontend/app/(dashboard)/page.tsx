@@ -139,7 +139,7 @@ export default function OverviewPage() {
               </Pie>
               <Tooltip
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(value: number) => [value.toLocaleString(), 'Failures']}
+                formatter={(value) => [(value as number).toLocaleString(), 'Failures']}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -172,7 +172,7 @@ export default function OverviewPage() {
                 tickFormatter={v => `${v}%`} />
               <Tooltip
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']}
+                formatter={(v) => [`${v}%`, 'Failure Rate']}
               />
               <Area type="monotone" dataKey="failureRate" stroke="#ef4444" strokeWidth={2}
                 fill="url(#failGrad)" dot={false} />
@@ -192,7 +192,7 @@ export default function OverviewPage() {
               <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} tickFormatter={v => `${v}%`} />
               <Tooltip
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']}
+                formatter={(v) => [`${v}%`, 'Failure Rate']}
               />
               <Bar dataKey="failureRate" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -208,7 +208,7 @@ export default function OverviewPage() {
               <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} tickLine={false} width={28} />
               <Tooltip
                 contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: number) => [`${v}%`, 'Failure Rate']}
+                formatter={(v) => [`${v}%`, 'Failure Rate']}
               />
               <Bar dataKey="failureRate" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
             </BarChart>

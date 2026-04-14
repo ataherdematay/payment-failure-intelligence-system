@@ -4,7 +4,13 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { FAILURE_REASON_COLORS, FAILURE_REASON_LABELS, formatDate } from '@/lib/utils';
-import { TimeSeriesItem, FailureReason } from '@/lib/api';
+import { FailureReason } from '@/lib/api';
+
+interface TimeSeriesItem {
+  date: string;
+  failureRate: number;
+  byReason?: Record<string, number>;
+}
 
 const REASONS: FailureReason[] = [
   'insufficient_funds', 'network_error', 'fraud_suspected', 'expired_card', 'invalid_credentials',
@@ -36,7 +42,7 @@ export function TimeSeriesChart({ data, stacked = false }: Props) {
           <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
           <Tooltip
             contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-            formatter={(v: number, name: string) => [v, FAILURE_REASON_LABELS[name as FailureReason] ?? name]}
+            formatter={(v, name) => [v as number, FAILURE_REASON_LABELS[name as FailureReason] ?? String(name)]}
           />
           <Legend formatter={(v: string) => FAILURE_REASON_LABELS[v as FailureReason] ?? v} wrapperStyle={{ fontSize: 11 }} />
           {REASONS.map(r => (
@@ -69,7 +75,7 @@ export function TimeSeriesChart({ data, stacked = false }: Props) {
         <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} unit="%" />
         <Tooltip
           contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-          formatter={(v: number) => [`${v.toFixed(1)}%`, 'Failure Rate']}
+          formatter={(v) => [`${(v as number).toFixed(1)}%`, 'Failure Rate']}
         />
         <Area
           type="monotone"

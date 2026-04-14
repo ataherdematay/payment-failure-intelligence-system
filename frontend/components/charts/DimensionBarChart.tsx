@@ -14,8 +14,8 @@ interface Props {
 
 export function DimensionBarChart({ data, color = '#6366f1', layout = 'horizontal' }: Props) {
   const chartData = data.map(d => ({
-    name: d.name,
-    failureRate: parseFloat(d.failureRate.toFixed(1)),
+    name: d.name ?? d.country ?? d.device ?? d.paymentMethod ?? d.gateway ?? '—',
+    failureRate: parseFloat(parseFloat(d.failureRate).toFixed(1)),
   }));
 
   if (layout === 'vertical') {
@@ -40,7 +40,7 @@ export function DimensionBarChart({ data, color = '#6366f1', layout = 'horizonta
           />
           <Tooltip
             contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-            formatter={(v: number) => [formatPercent(v), 'Failure Rate']}
+            formatter={(v) => [formatPercent(v as number), 'Failure Rate']}
           />
           <Bar dataKey="failureRate" radius={[0, 4, 4, 0]} maxBarSize={24}>
             {chartData.map((_, i) => (
@@ -60,7 +60,7 @@ export function DimensionBarChart({ data, color = '#6366f1', layout = 'horizonta
         <YAxis unit="%" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
         <Tooltip
           contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-          formatter={(v: number) => [formatPercent(v), 'Failure Rate']}
+          formatter={(v) => [formatPercent(v as number), 'Failure Rate']}
         />
         <Bar dataKey="failureRate" radius={[4, 4, 0, 0]} maxBarSize={40}>
           {chartData.map((_, i) => (

@@ -4,7 +4,9 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import { FAILURE_REASON_COLORS, FAILURE_REASON_LABELS, formatNumber } from '@/lib/utils';
-import { FailureDistributionItem } from '@/lib/api';
+import { FailureByReasonItem } from '@/lib/api';
+
+type FailureDistributionItem = FailureByReasonItem & { count: number };
 
 interface Props { data: FailureDistributionItem[] }
 
@@ -55,14 +57,14 @@ export function FailureDistributionChart({ data }: Props) {
             color: 'var(--text-primary)',
             fontSize: 12,
           }}
-          formatter={(value: number, name: string) => [
-            `${formatNumber(value)} transactions`,
-            FAILURE_REASON_LABELS[name as keyof typeof FAILURE_REASON_LABELS] ?? name,
+          formatter={(value, name) => [
+            `${formatNumber(value as number)} transactions`,
+            FAILURE_REASON_LABELS[name as keyof typeof FAILURE_REASON_LABELS] ?? String(name),
           ]}
         />
         <Legend
-          formatter={(value: string) =>
-            FAILURE_REASON_LABELS[value as keyof typeof FAILURE_REASON_LABELS] ?? value
+          formatter={(value) =>
+            FAILURE_REASON_LABELS[value as keyof typeof FAILURE_REASON_LABELS] ?? String(value)
           }
           iconType="circle"
           iconSize={8}
