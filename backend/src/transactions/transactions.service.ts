@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { QueryTransactionsDto } from './dto/query-transactions.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TransactionsService {
@@ -120,7 +120,7 @@ export class TransactionsService {
           : parseFloat(rand(0.01, 0.44).toFixed(2));
 
         rows.push({
-          id: uuidv4(),
+          id: randomUUID(),
           userId: `user_${Math.floor(rand(1, 2000))}`,
           amount: parseFloat(rand(5, 5000).toFixed(2)),
           currency: 'USD',
