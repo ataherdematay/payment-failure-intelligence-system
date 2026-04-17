@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { QueryTransactionsDto } from './dto/query-transactions.dto';
@@ -19,6 +19,12 @@ export class TransactionsController {
   @ApiOperation({ summary: 'High-level KPI summary (totals, failure rate, avg risk)' })
   getSummary() {
     return this.service.getSummary();
+  }
+
+  @Post('seed')
+  @ApiOperation({ summary: 'Seed database with synthetic transactions' })
+  seed() {
+    return this.service.seed(5000);
   }
 
   @Get(':id')

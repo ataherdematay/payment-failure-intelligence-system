@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { QueryTransactionsDto } from './dto/query-transactions.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TransactionsService {
+  private readonly logger = new Logger(TransactionsService.name);
+
   constructor(
     @InjectRepository(Transaction)
     private readonly repo: Repository<Transaction>,
@@ -69,5 +72,76 @@ export class TransactionsService {
       failureRate: total > 0 ? ((failed / total) * 100).toFixed(2) : '0',
       avgRiskScore: parseFloat(avgRisk?.avg ?? '0').toFixed(3),
     };
+  }
+
+  // ─── Seed ─────────────────────────────────────────────────────────────────
+
+  async seed(count = 5000): Promise<{ inserted: number }> {
+    const existing = await this.repo.count();
+    if (existing >= count) {
+      this.logger.log(`DB already has ${existing} records — skipping seed.`);
+      return { inserted: 0 };
+    }
+
+    const COUNTRIES       = ['TR', 'US', 'DE', 'GB', 'FR', 'NL', 'AE', 'SA', 'PL', 'RU'];
+    const DEVICES         = ['mobile', 'desktop', 'tablet'];
+    const METHODS         = ['credit_card', 'debit_card', 'bank_transfer', 'digital_wallet'];
+    const GATEWAYS        = ['iyzico', 'stripe', 'paytr', 'garanti', 'akbank'];
+    const FAILURE_REASONS = [
+      'insufficient_funds', 'network_error', 'fraud_suspected',
+      'expired_card', 'invalid_credentials',
+    ];
+    const REASON_WEIGHTS  = [0.35, 0.25, 0.15, 0.15, 0.10];
+
+    const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+    const pickWeighted = (arr: string[], weights: number[]) => {
+      const r = Math.random(); let cum = 0;
+      for (let i = 0; i < arr.length; i++) { cum += weights[i]; if (r <= cum) return arr[i]; }
+      return arr[arr.length - 1];
+    };
+    const rand = (min: number, max: number) => Math.random() * (max - min) + min;
+
+    const now = new Date();
+    const batchSize = 500;
+    let totalInserted = 0;
+
+    for (let batch = 0; batch < Math.ceil(count / batchSize); batch++) {
+      const rows: Partial<Transaction>[] = [];
+      const batchCount = Math.min(batchSize, count - batch * batchSize);
+
+      for (let i = 0; i < batchCount; i++) {
+        const createdAt = new Date(now.getTime() - rand(0, 90 * 24 * 3600 * 1000));
+        const isFailed  = Math.random() < 0.35;
+        const isPending = !isFailed && Math.random() < 0.05;
+        const status    = isFailed ? 'failed' : isPending ? 'pending' : 'success';
+        const reason    = isFailed ? pickWeighted(FAILURE_REASONS, REASON_WEIGHTS) : null;
+        const riskScore = isFailed
+          ? parseFloat(rand(0.45, 0.99).toFixed(2))
+          : parseFloat(rand(0.01, 0.44).toFixed(2));
+
+        rows.push({
+          id: uuidv4(),
+          userId: `user_${Math.floor(rand(1, 2000))}`,
+          amount: parseFloat(rand(5, 5000).toFixed(2)),
+          currency: 'USD',
+          country: pick(COUNTRIES),
+          device: pick(DEVICES),
+          paymentMethod: pick(METHODS),
+          gateway: pick(GATEWAYS),
+          status,
+          failureReason: reason ?? undefined,
+          retryCount: isFailed ? Math.floor(rand(0, 4)) : 0,
+          riskScore,
+          createdAt,
+        });
+      }
+
+      await this.repo.createQueryBuilder().insert().into(Transaction).values(rows).orIgnore().execute();
+      totalInserted += batchCount;
+      this.logger.log(`Seeded batch ${batch + 1}: ${totalInserted}/${count}`);
+    }
+
+    this.logger.log(`Seed complete — ${totalInserted} transactions inserted.`);
+    return { inserted: totalInserted };
   }
 }
