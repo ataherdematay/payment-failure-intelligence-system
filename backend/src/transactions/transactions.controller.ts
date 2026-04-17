@@ -1,5 +1,10 @@
-import { Controller, Get, Post, Param, Query, ParseUUIDPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller, Get, Post, Delete, Param, Query, ParseUUIDPipe,
+  UseInterceptors, UploadedFile, UseGuards, HttpCode,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { QueryTransactionsDto } from './dto/query-transactions.dto';
 
@@ -21,10 +26,31 @@ export class TransactionsController {
     return this.service.getSummary();
   }
 
+  // ─── Admin endpoints (JWT protected) ────────────────────────────────────────
+
   @Post('seed')
   @ApiOperation({ summary: 'Seed database with synthetic transactions' })
   seed() {
     return this.service.seed(5000);
+  }
+
+  @Post('upload')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Upload CSV file with real transaction data' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  uploadCsv(@UploadedFile() file: Express.Multer.File) {
+    return this.service.importCsv(file.buffer.toString('utf-8'));
+  }
+
+  @Delete('clear')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Clear all transactions (admin only)' })
+  clear() {
+    return this.service.clearAll();
   }
 
   @Get(':id')

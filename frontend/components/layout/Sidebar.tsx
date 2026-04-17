@@ -11,7 +11,11 @@ import {
   Activity,
   ChevronLeft,
   Zap,
+  ShieldCheck,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -23,8 +27,9 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const pathname  = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <aside
@@ -117,8 +122,29 @@ export function Sidebar() {
         })}
       </nav>
 
+      {/* Admin / Auth links */}
+      <div style={{ padding: '8px 8px 4px', borderTop: '1px solid var(--border-subtle)' }}>
+        {user ? (
+          <>
+            <Link href="/admin" title={collapsed ? 'Admin' : undefined} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: '8px', marginBottom: '4px', textDecoration: 'none', color: pathname === '/admin' ? 'var(--accent-primary)' : 'var(--text-secondary)', background: pathname === '/admin' ? 'rgba(99,102,241,0.12)' : 'transparent', border: pathname === '/admin' ? '1px solid rgba(99,102,241,0.2)' : '1px solid transparent', fontWeight: pathname === '/admin' ? 600 : 400, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <ShieldCheck size={16} style={{ flexShrink: 0 }} />
+              {!collapsed && <span>Admin Paneli</span>}
+            </Link>
+            <button onClick={logout} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: '8px', marginBottom: '4px', border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <LogOut size={16} style={{ flexShrink: 0 }} />
+              {!collapsed && <span>Çıkış Yap</span>}
+            </button>
+          </>
+        ) : (
+          <Link href="/login" title={collapsed ? 'Giriş Yap' : undefined} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 10px', borderRadius: '8px', textDecoration: 'none', color: 'var(--text-secondary)', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', border: '1px solid transparent' }}>
+            <LogIn size={16} style={{ flexShrink: 0 }} />
+            {!collapsed && <span>Admin Girişi</span>}
+          </Link>
+        )}
+      </div>
+
       {/* Collapse toggle */}
-      <div style={{ padding: '12px 8px', borderTop: '1px solid var(--border-subtle)' }}>
+      <div style={{ padding: '4px 8px 12px' }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
           style={{

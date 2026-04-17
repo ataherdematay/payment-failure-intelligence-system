@@ -144,4 +144,71 @@ export class TransactionsService {
     this.logger.log(`Seed complete — ${totalInserted} transactions inserted.`);
     return { inserted: totalInserted };
   }
+
+  // ─── CSV Import ─────────────────────────────────────────────────────────────
+
+  async importCsv(csvContent: string): Promise<{ inserted: number; errors: string[] }> {
+    const lines  = csvContent.split('\n').map(l => l.trim()).filter(Boolean);
+    const header = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+    const rows   = lines.slice(1);
+    const errors: string[] = [];
+    const batch: Partial<Transaction>[] = [];
+
+    const idx = (name: string) => header.indexOf(name);
+
+    for (let i = 0; i < rows.length; i++) {
+      try {
+        // Handle quoted CSV fields
+        const cols = rows[i].match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g)
+          ?.map(v => v.replace(/^"|"$/g, '').trim()) ?? rows[i].split(',');
+
+        const get = (name: string) => cols[idx(name)] ?? '';
+
+        const amount    = parseFloat(get('amount'));
+        const riskScore = parseFloat(get('risk_score') || get('riskscore') || '0.3');
+        const status    = get('status') || 'failed';
+        const reason    = get('failure_reason') || get('failurereason') || null;
+
+        if (isNaN(amount)) { errors.push(`Row ${i + 2}: invalid amount`); continue; }
+
+        batch.push({
+          id:            get('id') || randomUUID(),
+          userId:        get('user_id') || get('userid') || `user_${i}`,
+          amount,
+          currency:      get('currency') || 'USD',
+          country:       (get('country') || 'US').toUpperCase().slice(0, 2),
+          device:        get('device') || 'desktop',
+          paymentMethod: get('payment_method') || get('paymentmethod') || 'credit_card',
+          gateway:       get('gateway') || 'stripe',
+          status,
+          failureReason: reason ?? undefined,
+          retryCount:    parseInt(get('retry_count') || '0') || 0,
+          riskScore:     isNaN(riskScore) ? 0.3 : Math.min(0.99, Math.max(0, riskScore)),
+          createdAt:     get('created_at') ? new Date(get('created_at')) : new Date(),
+        });
+      } catch (e) {
+        errors.push(`Row ${i + 2}: ${e.message}`);
+      }
+    }
+
+    if (batch.length) {
+      // Insert in chunks of 500
+      for (let s = 0; s < batch.length; s += 500) {
+        await this.repo.createQueryBuilder().insert().into(Transaction).values(batch.slice(s, s + 500)).orIgnore().execute();
+      }
+    }
+
+    this.logger.log(`CSV import complete: ${batch.length} inserted, ${errors.length} errors.`);
+    return { inserted: batch.length, errors };
+  }
+
+  // ─── Clear ──────────────────────────────────────────────────────────────────
+
+  async clearAll(): Promise<{ deleted: number }> {
+    const count = await this.repo.count();
+    await this.repo.clear();
+    this.logger.warn(`Cleared ${count} transactions from database.`);
+    return { deleted: count };
+  }
 }
+

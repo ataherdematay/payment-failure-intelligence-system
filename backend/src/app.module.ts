@@ -6,12 +6,14 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { InsightsModule } from './insights/insights.module';
 import { MlModule } from './ml/ml.module';
+import { AuthModule } from './auth/auth.module';
 import { TransactionsService } from './transactions/transactions.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     TypeOrmModule.forRootAsync({ useFactory: databaseConfig }),
+    AuthModule,
     TransactionsModule,
     AnalyticsModule,
     InsightsModule,
