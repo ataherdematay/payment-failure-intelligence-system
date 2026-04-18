@@ -112,6 +112,40 @@ export interface Insight {
   generatedAt?: string;
 }
 
+export type ActionType =
+  | 'enable_retry'
+  | 'reduce_gateway_weight'
+  | 'create_alert'
+  | 'mark_investigating'
+  | 'mark_resolved';
+
+export type ActionStatus = 'queued' | 'applied' | 'failed';
+
+export interface ExecuteActionRequest {
+  insightId: string;
+  actionType: ActionType;
+  parameters?: Record<string, unknown>;
+}
+
+export interface ActionLogItem {
+  id: string;
+  insightId: string;
+  actionType: ActionType;
+  parameters?: Record<string, unknown>;
+  actorEmail: string;
+  actorRole: string;
+  status: ActionStatus;
+  errorMessage?: string;
+  appliedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ActionHistoryResponse {
+  data: ActionLogItem[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
 // ML
 export interface PredictRequest {
   amount: number;
@@ -205,9 +239,48 @@ export const api = {
     return res.data;
   },
 
+  exportAnalyticsPdf: async (token: string, days = 30) => {
+    const res = await apiClient.get<Blob>('/reports/analytics/pdf', {
+      params: { days },
+      responseType: 'blob',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  },
+
   // ── Insights ──
   getInsights: async () => {
     const res = await apiClient.get<Insight[]>('/insights');
+    return res.data;
+  },
+
+  // ── Action Center (JWT required) ──
+  executeInsightAction: async (body: ExecuteActionRequest, token: string) => {
+    const res = await apiClient.post<ActionLogItem>('/actions/execute', body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  },
+
+  getActionHistory: async (token: string, page = 1, limit = 20) => {
+    const res = await apiClient.get<ActionHistoryResponse>('/actions/history', {
+      params: { page, limit },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  },
+
+  updateActionStatus: async (
+    id: string,
+    status: ActionStatus,
+    token: string,
+    errorMessage?: string,
+  ) => {
+    const res = await apiClient.patch<ActionLogItem>(
+      `/actions/${id}/status`,
+      { status, errorMessage },
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
     return res.data;
   },
 

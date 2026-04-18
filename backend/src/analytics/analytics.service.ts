@@ -30,9 +30,12 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('t.country', 'country')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
       .addSelect(
-        'ROUND((SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)',
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
+      .addSelect(
+        "ROUND((SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)",
         'failureRate',
       )
       .groupBy('t.country')
@@ -46,9 +49,12 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('t.device', 'device')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
       .addSelect(
-        'ROUND((SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)',
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
+      .addSelect(
+        "ROUND((SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)",
         'failureRate',
       )
       .groupBy('t.device')
@@ -62,9 +68,12 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('t.payment_method', 'paymentMethod')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
       .addSelect(
-        'ROUND((SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)',
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
+      .addSelect(
+        "ROUND((SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)",
         'failureRate',
       )
       .groupBy('t.payment_method')
@@ -78,8 +87,14 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('DATE(t.created_at)', 'date')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
-      .addSelect('SUM(CASE WHEN t.status = \'success\' THEN 1 ELSE 0 END)', 'success')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'success' THEN 1 ELSE 0 END)",
+        'success',
+      )
       .where(`t.created_at >= NOW() - make_interval(days => ${days})`)
       .groupBy('DATE(t.created_at)')
       .orderBy('date', 'ASC')
@@ -92,7 +107,10 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('EXTRACT(HOUR FROM t.created_at)::int', 'hour')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
       .groupBy('EXTRACT(HOUR FROM t.created_at)')
       .orderBy('hour', 'ASC')
       .getRawMany();
@@ -104,9 +122,12 @@ export class AnalyticsService {
       .createQueryBuilder('t')
       .select('t.gateway', 'gateway')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failed')
       .addSelect(
-        'ROUND((SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)',
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failed',
+      )
+      .addSelect(
+        "ROUND((SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)::decimal / COUNT(*)) * 100, 2)",
         'failureRate',
       )
       .addSelect('ROUND(AVG(t.amount)::numeric, 2)', 'avgAmount')
@@ -120,14 +141,18 @@ export class AnalyticsService {
     const result = await this.repo
       .createQueryBuilder('t')
       .select('SUM(t.amount)', 'totalRevenue')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN t.amount ELSE 0 END)', 'lostRevenue')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN t.amount ELSE 0 END)",
+        'lostRevenue',
+      )
       .getRawOne();
     return {
       totalRevenue: parseFloat(result.totalRevenue || '0').toFixed(2),
       lostRevenue: parseFloat(result.lostRevenue || '0').toFixed(2),
-      lostPercent: result.totalRevenue > 0
-        ? ((result.lostRevenue / result.totalRevenue) * 100).toFixed(2)
-        : '0',
+      lostPercent:
+        result.totalRevenue > 0
+          ? ((result.lostRevenue / result.totalRevenue) * 100).toFixed(2)
+          : '0',
     };
   }
 }

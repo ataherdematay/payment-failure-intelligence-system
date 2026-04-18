@@ -36,7 +36,8 @@ export class InsightsService {
         title: 'High Overall Failure Rate',
         description: `${failureRate.toFixed(1)}% of transactions are failing — above the 15% industry benchmark.`,
         metric: `${failureRate.toFixed(1)}% failure rate`,
-        recommendation: 'Investigate top failure reasons and implement retry logic with exponential backoff.',
+        recommendation:
+          'Investigate top failure reasons and implement retry logic with exponential backoff.',
       });
     }
 
@@ -60,13 +61,14 @@ export class InsightsService {
         title: `Top Failure: ${byReason.reason.replace(/_/g, ' ')}`,
         description: `"${byReason.reason}" accounts for ${byReason.cnt} failures.`,
         metric: `${byReason.cnt} failures`,
-        recommendation: byReason.reason === 'insufficient_funds'
-          ? 'Consider payment plans or retry scheduling during pay periods.'
-          : byReason.reason === 'network_error'
-          ? 'Implement circuit breakers and multi-gateway failover.'
-          : byReason.reason === 'fraud_suspected'
-          ? 'Review fraud thresholds — high false positive rate may be blocking legitimate transactions.'
-          : 'Investigate root cause and implement targeted fixes.',
+        recommendation:
+          byReason.reason === 'insufficient_funds'
+            ? 'Consider payment plans or retry scheduling during pay periods.'
+            : byReason.reason === 'network_error'
+              ? 'Implement circuit breakers and multi-gateway failover.'
+              : byReason.reason === 'fraud_suspected'
+                ? 'Review fraud thresholds — high false positive rate may be blocking legitimate transactions.'
+                : 'Investigate root cause and implement targeted fixes.',
       });
     }
 
@@ -75,13 +77,19 @@ export class InsightsService {
       .createQueryBuilder('t')
       .select('t.gateway', 'gateway')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failedCount')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failedCount',
+      )
       .groupBy('t.gateway')
       .getRawMany();
 
     const worstGateway = gateways
-      .filter(g => parseInt(g.total) > 100)
-      .map(g => ({ ...g, rate: (parseInt(g.failedCount) / parseInt(g.total)) * 100 }))
+      .filter((g) => parseInt(g.total) > 100)
+      .map((g) => ({
+        ...g,
+        rate: (parseInt(g.failedCount) / parseInt(g.total)) * 100,
+      }))
       .sort((a, b) => b.rate - a.rate)[0];
 
     if (worstGateway && worstGateway.rate > 20) {
@@ -101,16 +109,21 @@ export class InsightsService {
       .createQueryBuilder('t')
       .select('t.device', 'device')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failedCount')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failedCount',
+      )
       .groupBy('t.device')
       .getRawMany();
 
-    const mobile  = deviceStats.find(d => d.device === 'mobile');
-    const desktop = deviceStats.find(d => d.device === 'desktop');
+    const mobile = deviceStats.find((d) => d.device === 'mobile');
+    const desktop = deviceStats.find((d) => d.device === 'desktop');
 
     if (mobile && desktop) {
-      const mobileRate  = (parseInt(mobile.failedCount)  / parseInt(mobile.total))  * 100;
-      const desktopRate = (parseInt(desktop.failedCount) / parseInt(desktop.total)) * 100;
+      const mobileRate =
+        (parseInt(mobile.failedCount) / parseInt(mobile.total)) * 100;
+      const desktopRate =
+        (parseInt(desktop.failedCount) / parseInt(desktop.total)) * 100;
       const gap = mobileRate - desktopRate;
       if (gap > 5) {
         insights.push({
@@ -120,7 +133,8 @@ export class InsightsService {
           title: 'Mobile Failure Rate Significantly Higher',
           description: `Mobile failure rate (${mobileRate.toFixed(1)}%) is ${gap.toFixed(1)}pp higher than desktop (${desktopRate.toFixed(1)}%).`,
           metric: `+${gap.toFixed(1)}pp vs desktop`,
-          recommendation: 'Optimize mobile payment flows and add digital wallet support.',
+          recommendation:
+            'Optimize mobile payment flows and add digital wallet support.',
         });
       }
     }
@@ -130,13 +144,19 @@ export class InsightsService {
       .createQueryBuilder('t')
       .select('EXTRACT(HOUR FROM t.created_at)::int', 'hour')
       .addSelect('COUNT(*)', 'total')
-      .addSelect('SUM(CASE WHEN t.status = \'failed\' THEN 1 ELSE 0 END)', 'failedCount')
+      .addSelect(
+        "SUM(CASE WHEN t.status = 'failed' THEN 1 ELSE 0 END)",
+        'failedCount',
+      )
       .groupBy('EXTRACT(HOUR FROM t.created_at)')
       .getRawMany();
 
-    const nightHours = hourly.filter(h => h.hour >= 2 && h.hour <= 5);
-    const nightTotal  = nightHours.reduce((s, h) => s + parseInt(h.total), 0);
-    const nightFailed = nightHours.reduce((s, h) => s + parseInt(h.failedCount), 0);
+    const nightHours = hourly.filter((h) => h.hour >= 2 && h.hour <= 5);
+    const nightTotal = nightHours.reduce((s, h) => s + parseInt(h.total), 0);
+    const nightFailed = nightHours.reduce(
+      (s, h) => s + parseInt(h.failedCount),
+      0,
+    );
 
     if (nightTotal > 0) {
       const nightRate = (nightFailed / nightTotal) * 100;
@@ -148,7 +168,8 @@ export class InsightsService {
           title: 'High Failure Rate During Night Hours (2–5 AM)',
           description: `Failure rate spikes to ${nightRate.toFixed(1)}% between 2–5 AM vs ${failureRate.toFixed(1)}% overall.`,
           metric: `${nightRate.toFixed(1)}% failure rate (2–5 AM)`,
-          recommendation: 'Schedule maintenance windows carefully and add night-time health monitoring.',
+          recommendation:
+            'Schedule maintenance windows carefully and add night-time health monitoring.',
         });
       }
     }

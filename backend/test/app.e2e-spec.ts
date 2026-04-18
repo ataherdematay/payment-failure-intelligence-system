@@ -6,47 +6,45 @@ import { TransactionsModule } from '../src/transactions/transactions.module';
 import { AuthModule } from '../src/auth/auth.module';
 import { Transaction } from '../src/transactions/transaction.entity';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require('supertest');
-
 
 // ── Mock Repo ─────────────────────────────────────────────────────────────────
 
 const mockTx = (id = 'uuid-001') => ({
   id,
-  userId:        'user_001',
-  amount:        249.99,
-  currency:      'USD',
-  country:       'TR',
-  device:        'mobile',
+  userId: 'user_001',
+  amount: 249.99,
+  currency: 'USD',
+  country: 'TR',
+  device: 'mobile',
   paymentMethod: 'credit_card',
-  gateway:       'iyzico',
-  status:        'failed',
+  gateway: 'iyzico',
+  status: 'failed',
   failureReason: 'insufficient_funds',
-  retryCount:    1,
-  riskScore:     0.72,
-  createdAt:     new Date('2026-01-15T10:00:00Z'),
+  retryCount: 1,
+  riskScore: 0.72,
+  createdAt: new Date('2026-01-15T10:00:00Z'),
 });
 
 const makeQb = (data: any[], total: number) => ({
-  andWhere:      jest.fn().mockReturnThis(),
-  orderBy:       jest.fn().mockReturnThis(),
-  skip:          jest.fn().mockReturnThis(),
-  take:          jest.fn().mockReturnThis(),
-  select:        jest.fn().mockReturnThis(),
+  andWhere: jest.fn().mockReturnThis(),
+  orderBy: jest.fn().mockReturnThis(),
+  skip: jest.fn().mockReturnThis(),
+  take: jest.fn().mockReturnThis(),
+  select: jest.fn().mockReturnThis(),
   getManyAndCount: jest.fn().mockResolvedValue([data, total]),
-  getRawOne:     jest.fn().mockResolvedValue({ avg: '0.450' }),
-  insert:        jest.fn().mockReturnThis(),
-  into:          jest.fn().mockReturnThis(),
-  values:        jest.fn().mockReturnThis(),
-  orIgnore:      jest.fn().mockReturnThis(),
-  execute:       jest.fn().mockResolvedValue({}),
+  getRawOne: jest.fn().mockResolvedValue({ avg: '0.450' }),
+  insert: jest.fn().mockReturnThis(),
+  into: jest.fn().mockReturnThis(),
+  values: jest.fn().mockReturnThis(),
+  orIgnore: jest.fn().mockReturnThis(),
+  execute: jest.fn().mockResolvedValue({}),
 });
 
 const mockRepo = {
-  count:              jest.fn(),
-  findOne:            jest.fn(),
-  clear:              jest.fn().mockResolvedValue(undefined),
+  count: jest.fn(),
+  findOne: jest.fn(),
+  clear: jest.fn().mockResolvedValue(undefined),
   createQueryBuilder: jest.fn(() => makeQb([mockTx()], 1)),
 };
 
@@ -65,13 +63,17 @@ describe('TransactionsController (e2e)', () => {
       .compile();
 
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     app.setGlobalPrefix('api/v1');
     await app.init();
 
     // Get a real JWT for protected-route tests
     jwtToken = module.get<JwtService>(JwtService).sign({
-      sub: 'admin', email: 'admin@pfis.com', role: 'admin',
+      sub: 'admin',
+      email: 'admin@pfis.com',
+      role: 'admin',
     });
   });
 
@@ -92,18 +94,16 @@ describe('TransactionsController (e2e)', () => {
       request(app.getHttpServer())
         .get('/api/v1/transactions/summary')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('total');
           expect(res.body).toHaveProperty('failureRate');
           expect(res.body).toHaveProperty('avgRiskScore');
-        }),
-    );
+        }));
 
     it('is publicly accessible (no auth required)', () =>
       request(app.getHttpServer())
         .get('/api/v1/transactions/summary')
-        .expect(200),
-    );
+        .expect(200));
   });
 
   // ── GET /transactions ─────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ describe('TransactionsController (e2e)', () => {
       return request(app.getHttpServer())
         .get('/api/v1/transactions')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(Array.isArray(res.body.data)).toBe(true);
           expect(res.body.meta).toHaveProperty('total');
           expect(res.body.meta).toHaveProperty('page');
@@ -125,8 +125,7 @@ describe('TransactionsController (e2e)', () => {
     it('accepts pagination query params', () =>
       request(app.getHttpServer())
         .get('/api/v1/transactions?page=2&limit=5')
-        .expect(200),
-    );
+        .expect(200));
   });
 
   // ── GET /transactions/:id ─────────────────────────────────────────────────
@@ -139,7 +138,7 @@ describe('TransactionsController (e2e)', () => {
       return request(app.getHttpServer())
         .get(`/api/v1/transactions/${validUuid}`)
         .expect(200)
-        .expect(res => expect(res.body.id).toBe(validUuid));
+        .expect((res) => expect(res.body.id).toBe(validUuid));
     });
 
     it('returns 404 for non-existent transaction', async () => {
@@ -157,8 +156,7 @@ describe('TransactionsController (e2e)', () => {
     it('returns 401 without JWT', () =>
       request(app.getHttpServer())
         .delete('/api/v1/transactions/clear')
-        .expect(401),
-    );
+        .expect(401));
 
     it('returns 200 with valid JWT', async () => {
       mockRepo.count.mockResolvedValue(5000);
@@ -167,7 +165,7 @@ describe('TransactionsController (e2e)', () => {
         .delete('/api/v1/transactions/clear')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(200)
-        .expect(res => expect(res.body).toHaveProperty('deleted'));
+        .expect((res) => expect(res.body).toHaveProperty('deleted'));
     });
   });
 
@@ -177,8 +175,7 @@ describe('TransactionsController (e2e)', () => {
     it('returns 401 without JWT', () =>
       request(app.getHttpServer())
         .post('/api/v1/transactions/upload')
-        .expect(401),
-    );
+        .expect(401));
 
     it('accepts CSV upload when authenticated (2xx response)', async () => {
       mockRepo.createQueryBuilder.mockReturnValue(makeQb([], 0));
@@ -188,7 +185,10 @@ describe('TransactionsController (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/transactions/upload')
         .set('Authorization', `Bearer ${jwtToken}`)
-        .attach('file', Buffer.from(csv), { filename: 'data.csv', contentType: 'text/csv' });
+        .attach('file', Buffer.from(csv), {
+          filename: 'data.csv',
+          contentType: 'text/csv',
+        });
 
       // Accept 200/201 — multer dest may differ in test env
       expect([200, 201]).toContain(res.status);
@@ -207,7 +207,9 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     app.setGlobalPrefix('api/v1');
     await app.init();
   });
@@ -220,32 +222,28 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/login')
         .send({ email: 'admin@pfis.com', password: 'pfis2026' })
         .expect(201)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('access_token');
           expect(res.body).toHaveProperty('user');
           expect(res.body.user.role).toBe('admin');
-        }),
-    );
+        }));
 
     it('returns 401 for wrong password', () =>
       request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: 'admin@pfis.com', password: 'wrong' })
-        .expect(401),
-    );
+        .expect(401));
 
     it('returns 401 for wrong email', () =>
       request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: 'hacker@evil.com', password: 'pfis2026' })
-        .expect(401),
-    );
+        .expect(401));
 
     it('returns 400 for missing body fields', () =>
       request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({})
-        .expect(400),
-    );
+        .expect(400));
   });
 });

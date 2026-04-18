@@ -8,7 +8,9 @@ export class InsightsController {
   constructor(private readonly service: InsightsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Generate actionable insights from transaction data' })
+  @ApiOperation({
+    summary: 'Generate actionable insights from transaction data',
+  })
   getInsights() {
     return this.service.generateInsights();
   }

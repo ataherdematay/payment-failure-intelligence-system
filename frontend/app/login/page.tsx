@@ -40,7 +40,7 @@ export default function LoginPage() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
           }}>⚡</div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
-            PFIS Admin
+            PFIS Workspace Login
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>
             Payment Failure Intelligence System
@@ -107,8 +107,8 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 12, color: 'var(--text-muted)' }}>
-          Yalnızca yetkili kullanıcılar erişebilir
+        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Rol bazlı çok kullanıcılı erişim aktiftir (admin / analyst / operator)
         </p>
       </div>
     </div>

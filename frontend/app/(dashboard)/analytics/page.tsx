@@ -3,19 +3,48 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { FAILURE_REASON_LABELS, FAILURE_REASON_COLORS } from '@/lib/utils';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ChartCard } from '@/components/ui/ChartCard';
-import { Filter } from 'lucide-react';
+import { Download, Filter } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 
 export default function AnalyticsPage() {
+  const { token } = useAuth();
   const [filterStatus,  setFilterStatus]  = useState('');
   const [filterReason,  setFilterReason]  = useState('');
   const [currentPage,   setCurrentPage]   = useState(1);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
+
+  const handleExportPdf = async () => {
+    if (!token) {
+      setExportMsg('PDF export için giriş yapmalısın.');
+      return;
+    }
+
+    try {
+      setExportingPdf(true);
+      setExportMsg(null);
+
+      const pdfBlob = await api.exportAnalyticsPdf(token, 30);
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pfis-analytics-${new Date().toISOString().slice(0, 10)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setExportMsg('PDF raporu indirildi.');
+    } catch {
+      setExportMsg('PDF export başarısız oldu.');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
 
   const { data: byPaymentMethod = [], isLoading: loadingPM } = useQuery({
     queryKey: ['by-payment-method'],
@@ -88,6 +117,33 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }} className="fade-in">
+
+      <div className="glass" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button
+          type="button"
+          disabled={exportingPdf}
+          onClick={handleExportPdf}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px',
+            borderRadius: 8,
+            border: '1px solid var(--border-subtle)',
+            background: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            cursor: exportingPdf ? 'not-allowed' : 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          <Download size={14} />
+          {exportingPdf ? 'PDF hazırlanıyor...' : 'Export Analytics PDF'}
+        </button>
+        {exportMsg && (
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{exportMsg}</span>
+        )}
+      </div>
 
       {/* Charts row 1 */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>

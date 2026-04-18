@@ -1,5 +1,10 @@
 import {
-  Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index,
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 export enum TransactionStatus {
@@ -64,13 +69,24 @@ export class Transaction {
   status: string;
 
   @Index()
-  @Column({ type: 'varchar', name: 'failure_reason', length: 25, nullable: true })
+  @Column({
+    type: 'varchar',
+    name: 'failure_reason',
+    length: 25,
+    nullable: true,
+  })
   failureReason: string;
 
   @Column({ name: 'retry_count', default: 0 })
   retryCount: number;
 
-  @Column({ name: 'risk_score', type: 'decimal', precision: 3, scale: 2, default: 0 })
+  @Column({
+    name: 'risk_score',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    default: 0,
+  })
   riskScore: number;
 
   @Index()

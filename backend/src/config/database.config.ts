@@ -14,4 +14,3 @@ export const databaseConfig = (): TypeOrmModuleOptions => ({
     ? { rejectUnauthorized: false }
     : false,
 });
-

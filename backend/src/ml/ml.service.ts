@@ -1,4 +1,8 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -33,7 +37,9 @@ export class MlService {
     } catch (err) {
       const axiosErr = err as AxiosError;
       this.logger.warn(`ML service unavailable: ${axiosErr.message}`);
-      throw new ServiceUnavailableException('ML service is not available. Please start the FastAPI ML service.');
+      throw new ServiceUnavailableException(
+        'ML service is not available. Please start the FastAPI ML service.',
+      );
     }
   }
 
@@ -50,9 +56,7 @@ export class MlService {
 
   async healthCheck() {
     try {
-      const res = await firstValueFrom(
-        this.http.get(`${this.baseUrl}/health`),
-      );
+      const res = await firstValueFrom(this.http.get(`${this.baseUrl}/health`));
       return { status: 'online', ...res.data };
     } catch {
       return { status: 'offline', message: 'ML service not reachable' };

@@ -2,7 +2,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface User { email: string; role: string }
+interface User {
+  id?: string;
+  email: string;
+  fullName?: string;
+  role: string;
+}
 interface AuthCtx {
   user: User | null;
   token: string | null;

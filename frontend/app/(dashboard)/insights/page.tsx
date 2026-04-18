@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { ActionType, api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { SEVERITY_COLORS, SEVERITY_BG } from '@/lib/utils';
 import {
   AlertTriangle, TrendingDown, ShieldAlert, Wifi,
@@ -26,12 +28,59 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function InsightsPage() {
+  const { token } = useAuth();
   const { data: insights = [], isLoading, error } = useQuery({
     queryKey: ['insights'],
     queryFn: () => api.getInsights(),
     staleTime: 60_000,
     retry: 1,
   });
+
+  const [busyInsightId, setBusyInsightId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
+  const handleAction = async (
+    insightId: string,
+    actionType: ActionType,
+    parameters?: Record<string, unknown>,
+  ) => {
+    if (!token) {
+      setFeedback({
+        type: 'error',
+        message: 'Aksiyon almak için önce admin girişi yapmalısın.',
+      });
+      return;
+    }
+
+    setBusyInsightId(insightId);
+    setFeedback(null);
+
+    try {
+      await api.executeInsightAction(
+        {
+          insightId,
+          actionType,
+          parameters,
+        },
+        token,
+      );
+
+      setFeedback({
+        type: 'success',
+        message: 'Aksiyon başarıyla işlendi ve Action Center geçmişine kaydedildi.',
+      });
+    } catch {
+      setFeedback({
+        type: 'error',
+        message: 'Aksiyon gönderilemedi. Token süresi dolmuş olabilir.',
+      });
+    } finally {
+      setBusyInsightId(null);
+    }
+  };
 
   const critical = insights.filter(i => i.severity === 'critical');
   const high     = insights.filter(i => i.severity === 'high');
@@ -105,6 +154,31 @@ export default function InsightsPage() {
       )}
 
       {/* Insights grid */}
+      {feedback && (
+        <div
+          className="glass"
+          style={{
+            padding: '12px 16px',
+            borderColor:
+              feedback.type === 'success'
+                ? 'rgba(34,197,94,0.35)'
+                : 'rgba(239,68,68,0.35)',
+            background:
+              feedback.type === 'success'
+                ? 'rgba(34,197,94,0.08)'
+                : 'rgba(239,68,68,0.08)',
+            color:
+              feedback.type === 'success'
+                ? 'var(--accent-success)'
+                : 'var(--accent-danger)',
+            fontSize: 13,
+            fontWeight: 500,
+          }}
+        >
+          {feedback.message}
+        </div>
+      )}
+
       {!isLoading && !error && insights.length === 0 && (
         <div className="glass" style={{ padding: 40, textAlign: 'center' }}>
           <CheckCircle size={32} color="var(--accent-success)" style={{ marginBottom: 8 }} />
@@ -201,6 +275,77 @@ export default function InsightsPage() {
                   <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                     {insight.recommendation}
                   </span>
+                </div>
+
+                {/* Action Center quick actions */}
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: 8,
+                    marginTop: 10,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <button
+                    type="button"
+                    disabled={busyInsightId === insight.id}
+                    onClick={() => handleAction(insight.id, 'mark_investigating')}
+                    style={{
+                      fontSize: 11,
+                      padding: '6px 10px',
+                      borderRadius: 8,
+                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-secondary)',
+                      cursor: busyInsightId === insight.id ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Mark Investigating
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={busyInsightId === insight.id}
+                    onClick={() =>
+                      handleAction(insight.id, 'enable_retry', {
+                        source: 'insights',
+                        reason: insight.category,
+                      })
+                    }
+                    style={{
+                      fontSize: 11,
+                      padding: '6px 10px',
+                      borderRadius: 8,
+                      border: '1px solid rgba(99,102,241,0.4)',
+                      background: 'rgba(99,102,241,0.10)',
+                      color: 'var(--accent-primary)',
+                      cursor: busyInsightId === insight.id ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Enable Retry Policy
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={busyInsightId === insight.id}
+                    onClick={() =>
+                      handleAction(insight.id, 'create_alert', {
+                        severity: sev,
+                        metric: insight.metric,
+                      })
+                    }
+                    style={{
+                      fontSize: 11,
+                      padding: '6px 10px',
+                      borderRadius: 8,
+                      border: '1px solid rgba(245,158,11,0.45)',
+                      background: 'rgba(245,158,11,0.10)',
+                      color: 'var(--accent-warning)',
+                      cursor: busyInsightId === insight.id ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Create Alert Rule
+                  </button>
                 </div>
 
                 {/* Affected + timestamp */}

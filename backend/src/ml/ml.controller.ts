@@ -10,13 +10,19 @@ export class MlController {
 
   @Post('predict')
   @ApiOperation({ summary: 'Predict failure reason for a transaction' })
-  predict(@Body() dto: PredictDto) { return this.service.predict(dto); }
+  predict(@Body() dto: PredictDto) {
+    return this.service.predict(dto);
+  }
 
   @Get('metrics')
   @ApiOperation({ summary: 'Get trained model performance metrics' })
-  getMetrics() { return this.service.getModelMetrics(); }
+  getMetrics() {
+    return this.service.getModelMetrics();
+  }
 
   @Get('health')
   @ApiOperation({ summary: 'Check ML service health' })
-  health() { return this.service.healthCheck(); }
+  health() {
+    return this.service.healthCheck();
+  }
 }

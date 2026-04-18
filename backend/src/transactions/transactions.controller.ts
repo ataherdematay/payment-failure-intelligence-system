@@ -1,10 +1,25 @@
 import {
-  Controller, Get, Post, Delete, Param, Query, ParseUUIDPipe,
-  UseInterceptors, UploadedFile, UseGuards, HttpCode,
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Query,
+  ParseUUIDPipe,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { QueryTransactionsDto } from './dto/query-transactions.dto';
 
@@ -21,7 +36,9 @@ export class TransactionsController {
   }
 
   @Get('summary')
-  @ApiOperation({ summary: 'High-level KPI summary (totals, failure rate, avg risk)' })
+  @ApiOperation({
+    summary: 'High-level KPI summary (totals, failure rate, avg risk)',
+  })
   getSummary() {
     return this.service.getSummary();
   }
@@ -39,7 +56,9 @@ export class TransactionsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upload CSV file with real transaction data' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }),
+  )
   uploadCsv(@UploadedFile() file: Express.Multer.File) {
     return this.service.importCsv(file.buffer.toString('utf-8'));
   }

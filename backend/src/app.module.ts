@@ -8,6 +8,8 @@ import { InsightsModule } from './insights/insights.module';
 import { MlModule } from './ml/ml.module';
 import { AuthModule } from './auth/auth.module';
 import { TransactionsService } from './transactions/transactions.service';
+import { ActionsModule } from './actions/actions.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { TransactionsService } from './transactions/transactions.service';
     TransactionsModule,
     AnalyticsModule,
     InsightsModule,
+    ActionsModule,
+    ReportsModule,
     MlModule,
   ],
 })
@@ -30,7 +34,9 @@ export class AppModule implements OnApplicationBootstrap {
       this.logger.log('🌱 Running startup seed check...');
       const result = await this.txService.seed(5000);
       if (result.inserted > 0) {
-        this.logger.log(`✅ Seeded ${result.inserted} transactions on startup.`);
+        this.logger.log(
+          `✅ Seeded ${result.inserted} transactions on startup.`,
+        );
       } else {
         this.logger.log('✅ Database already seeded.');
       }

@@ -12,6 +12,15 @@ const CSV_TEMPLATE = `id,user_id,amount,currency,country,device,payment_method,g
 ,user_003,499.00,USD,DE,tablet,bank_transfer,paytr,failed,network_error,2,0.71,2024-01-15T12:15:00Z`;
 
 type Stats = { total: number; failed: number; success: number; failureRate: string };
+type UserRole = 'admin' | 'analyst' | 'operator';
+type PanelUser = {
+  id: string;
+  email: string;
+  fullName: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt?: string;
+};
 
 export default function AdminPage() {
   const { user, token, logout, loading } = useAuth();
@@ -26,6 +35,15 @@ export default function AdminPage() {
   const [clearing, setClearing]   = useState(false);
   const [seeding, setSeeding]     = useState(false);
   const [msg, setMsg]             = useState('');
+  const [users, setUsers]         = useState<PanelUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [newUser, setNewUser] = useState({
+    fullName: '',
+    email: '',
+    role: 'analyst' as UserRole,
+    password: '',
+  });
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -36,6 +54,12 @@ export default function AdminPage() {
     if (token) fetchStats();
   }, [token]);
 
+  useEffect(() => {
+    if (token && user?.role === 'admin') {
+      fetchUsers();
+    }
+  }, [token, user?.role]);
+
   const fetchStats = async () => {
     try {
       const res = await fetch(`${API}/transactions/summary`);
@@ -43,7 +67,56 @@ export default function AdminPage() {
     } catch {}
   };
 
+  const fetchUsers = async () => {
+    if (!token) return;
+    setLoadingUsers(true);
+    try {
+      const res = await fetch(`${API}/auth/users`, {
+        headers: authHeader(),
+      });
+      if (!res.ok) throw new Error('Kullanıcı listesi alınamadı');
+      const data = await res.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch {
+      setMsg('❌ Kullanıcı listesi alınamadı');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   const authHeader = () => ({ Authorization: `Bearer ${token}` });
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+
+    setCreatingUser(true);
+    try {
+      const res = await fetch(`${API}/auth/users`, {
+        method: 'POST',
+        headers: {
+          ...authHeader(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Kullanıcı oluşturulamadı');
+
+      setMsg(`✅ Yeni kullanıcı oluşturuldu: ${data.email}`);
+      setNewUser({
+        fullName: '',
+        email: '',
+        role: 'analyst',
+        password: '',
+      });
+      fetchUsers();
+    } catch (err: unknown) {
+      setMsg(`❌ ${err instanceof Error ? err.message : 'Kullanıcı oluşturma hatası'}`);
+    } finally {
+      setCreatingUser(false);
+    }
+  };
 
   // ── CSV Upload ──────────────────────────────────────────────────────────────
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -278,6 +351,120 @@ export default function AdminPage() {
                 Veritabanındaki tüm işlem kayıtlarını kalıcı olarak siler. Bu işlem geri alınamaz!
               </p>
               {btn(clearing ? '⏳ Siliniyor...' : '🗑️ Tüm Veriyi Temizle', handleClear, clearing, true)}
+            </div>
+          </div>
+        ))}
+
+        {/* User Management */}
+        {user.role === 'admin' && section('Kullanıcı Yönetimi', '👥', (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+              Çok kullanıcılı sistem için yeni kullanıcı oluşturabilir ve mevcut kullanıcıları görüntüleyebilirsiniz.
+            </p>
+
+            <form onSubmit={handleCreateUser} style={{
+              display: 'grid',
+              gridTemplateColumns: '1.2fr 1.2fr 0.8fr 1fr auto',
+              gap: 10,
+              alignItems: 'end',
+            }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Ad Soyad</label>
+                <input
+                  value={newUser.fullName}
+                  onChange={(e) => setNewUser((p) => ({ ...p, fullName: e.target.value }))}
+                  required
+                  style={{ width: '100%', padding: '9px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>E-posta</label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser((p) => ({ ...p, email: e.target.value }))}
+                  required
+                  style={{ width: '100%', padding: '9px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Rol</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser((p) => ({ ...p, role: e.target.value as UserRole }))}
+                  style={{ width: '100%', padding: '9px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+                >
+                  <option value="admin">admin</option>
+                  <option value="analyst">analyst</option>
+                  <option value="operator">operator</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>Şifre</label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser((p) => ({ ...p, password: e.target.value }))}
+                  required
+                  minLength={6}
+                  style={{ width: '100%', padding: '9px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={creatingUser}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: creatingUser ? 'var(--border)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                  color: '#fff',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: creatingUser ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {creatingUser ? 'Ekleniyor...' : 'Kullanıcı Ekle'}
+              </button>
+            </form>
+
+            <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                Mevcut Kullanıcılar
+              </div>
+              <div style={{ maxHeight: 220, overflow: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr>
+                      {['Ad Soyad', 'E-posta', 'Rol', 'Durum'].map((h) => (
+                        <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', fontWeight: 600 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingUsers ? (
+                      <tr>
+                        <td colSpan={4} style={{ padding: 10, color: 'var(--text-muted)' }}>Yükleniyor...</td>
+                      </tr>
+                    ) : users.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} style={{ padding: 10, color: 'var(--text-muted)' }}>Kullanıcı bulunamadı.</td>
+                      </tr>
+                    ) : users.map((u) => (
+                      <tr key={u.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                        <td style={{ padding: '8px 10px', color: 'var(--text-primary)' }}>{u.fullName}</td>
+                        <td style={{ padding: '8px 10px', color: 'var(--text-secondary)' }}>{u.email}</td>
+                        <td style={{ padding: '8px 10px', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{u.role}</td>
+                        <td style={{ padding: '8px 10px', color: u.isActive ? '#22c55e' : '#ef4444' }}>{u.isActive ? 'Aktif' : 'Pasif'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         ))}

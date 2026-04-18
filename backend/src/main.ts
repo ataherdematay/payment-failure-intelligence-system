@@ -8,7 +8,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
   );
 
   const corsOrigin = process.env.CORS_ORIGIN;
@@ -22,14 +26,21 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Payment Failure Intelligence System API')
-    .setDescription('PFIS — transaction analytics, ML predictions, actionable insights')
+    .setDescription(
+      'PFIS — transaction analytics, ML predictions, actionable insights',
+    )
     .setVersion('1.0')
     .addTag('transactions')
     .addTag('analytics')
     .addTag('insights')
+    .addTag('reports')
     .addTag('ml')
     .build();
-  SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, config));
+  SwaggerModule.setup(
+    'api/docs',
+    app,
+    SwaggerModule.createDocument(app, config),
+  );
 
   const port = process.env.PORT || process.env.BACKEND_PORT || 3001;
   await app.listen(port);
