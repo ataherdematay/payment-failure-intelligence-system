@@ -10,7 +10,9 @@
 
 <p align="center">
   <strong>Analyze · Classify · Simulate · Optimize</strong><br/>
-  A full-stack payment intelligence platform that turns transaction failures into actionable business decisions.
+  A full-stack payment intelligence platform that turns transaction failures into actionable business decisions.<br/>
+  <br/>
+  🌍 <strong>Live Demo:</strong> <a href="https://frontend-phi-self-xq19jn53gh.vercel.app">frontend-phi-self-xq19jn53gh.vercel.app</a>
 </p>
 
 ---
@@ -24,7 +26,7 @@ This project simulates the **intelligence layer** that sits inside such a platfo
 | Business Problem | PFIS Solution |
 |---|---|
 | Which gateway is underperforming? | Gateway comparison dashboard with per-provider failure rates |
-| Why are payments failing? | ML-based failure reason classifier (5 categories, ~82% accuracy) |
+| Why are payments failing? | ML-based failure reason classifier (5 categories) |
 | What's a failure costing us? | Real-time revenue-at-risk calculation |
 | What if we tune retry logic? | Parameter-based simulation engine with scenario comparison |
 | What should we act on first? | AI-generated prioritized insight cards with recommendations |
@@ -35,26 +37,20 @@ This project simulates the **intelligence layer** that sits inside such a platfo
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                   PFIS — Local Stack                     │
+│             PFIS — Production Architecture               │
 │                                                          │
 │  ┌───────────────┐   REST    ┌──────────────────────┐   │
 │  │  Next.js 16   │ ────────▶ │   NestJS Backend     │   │
-│  │  Dashboard    │           │   REST API + TypeORM  │   │
-│  │  :3000        │           │   :3001               │   │
+│  │  (Vercel)     │           │   (Railway)          │   │
 │  └───────────────┘           └──────────┬───────────┘   │
 │         │                               │               │
 │         │ ML predict                    ▼               │
 │         ▼                        ┌──────────────┐       │
-│  ┌───────────────┐               │  PostgreSQL   │       │
-│  │  FastAPI      │               │  :5432        │       │
+│  ┌───────────────┐               │ PostgreSQL   │       │
+│  │  FastAPI      │               │ (Railway)    │       │
 │  │  ML Service   │               └──────────────┘       │
-│  │  :8000        │                                       │
-│  └───────────────┘                                       │
-│                                                          │
-│  ┌───────────────┐                                       │
-│  │ Data Generator│──── seeds ──▶ PostgreSQL              │
-│  │   Python      │   10,000 tx                          │
-│  └───────────────┘                                       │
+│  │  (Railway)    │                                      │
+│  └───────────────┘                                      │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -91,6 +87,13 @@ What-if scenario engine for business decisions:
 - Output: simulated failure breakdown per reason + scenario comparison table
 - **Craftgate use case:** Model the impact of switching a high-failure gateway (e.g. Square 39.1%) to a lower-failure alternative
 
+### 🔐 Admin Panel & Custom Data
+A built-in data management suite protected by JWT authentication:
+- **CSV Data Upload:** Import your company's real payment logs
+- **Dynamic Training:** Retrain the ML model instantly via the UI on your live data
+- **Database Management:** Inject 5K synthetic transactions for demo or clear all data
+- **Login Credentials:** `admin@pfis.com` / `pfis2026`
+
 ---
 
 ## 🔧 Tech Stack
@@ -98,8 +101,8 @@ What-if scenario engine for business decisions:
 | Layer | Technology |
 |---|---|
 | Frontend | Next.js 16, TanStack Query, Recharts, TypeScript |
-| Backend | NestJS, TypeORM, PostgreSQL, Swagger |
-| ML Service | FastAPI, scikit-learn (RandomForest), Pydantic |
+| Backend | NestJS, TypeORM, PostgreSQL, Swagger, Jest, Supertest |
+| ML Service | FastAPI, scikit-learn (RandomForest), Pydantic, Pytest |
 | Data | Python data generator (10K synthetic transactions) |
 | Design | Dark glassmorphism, CSS variables, custom animations |
 
@@ -161,10 +164,14 @@ npm run dev                 # → http://localhost:3000
 
 ### Backend (`:3001/api/v1`)
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/transactions` | GET | List with filters (status, reason, page) |
-| `/transactions/summary` | GET | KPI summary (total, failed, rate, avg risk) |
+| Endpoint | Method | Auth | Description |
+|---|---|---|---|
+| `/auth/login` | POST | — | Returns JWT token |
+| `/transactions/upload` | POST | 🛡️ JWT | Upload CSV to DB |
+| `/transactions/seed` | POST | — | Seed 5K sandbox records |
+| `/transactions/clear` | DELETE | 🛡️ JWT | Wipe all transaction data |
+| `/transactions` | GET | — | List with filters (status, reason, page) |
+| `/transactions/summary` | GET | — | KPI summary (total, failed, rate, avg risk) |
 | `/analytics/failure-by-reason` | GET | Failure count per reason |
 | `/analytics/failure-by-country` | GET | Failure rate per country |
 | `/analytics/failure-by-device` | GET | Failure rate per device |
@@ -227,8 +234,31 @@ npm run dev                 # → http://localhost:3000
 - **Algorithm:** RandomForestClassifier (scikit-learn)
 - **Features:** amount, device (encoded), country (encoded), payment_method, hour_of_day, day_of_week
 - **Target:** failure_reason (5 classes)
-- **Performance:** ~82% accuracy on held-out test set
-- **Training data:** 3,765 failed transactions from the 10K synthetic dataset
+- **Training data:** Synthetic failure transactions representing real-world distribution (with dynamic retraining endpoint to adapt to uploaded company data)
+
+---
+
+## 🧪 Testing
+
+The codebase includes a comprehensive, automated test suite across all services:
+
+### Backend (NestJS + Jest)
+- **Unit Tests:** Full coverage of `TransactionsService` (pagination, filtering, aggregations) and `AuthService` (JWT generation, credentials validation).
+- **E2E Tests:** End-to-end endpoint checks spanning public routes, ML proxy integration, array formatting, and parameterized protected route testing using **Supertest**.
+```bash
+cd backend
+npm run test           # 19/19 Unit tests
+npm run test:e2e       # 14/14 E2E test scenarios
+```
+
+### ML Service (FastAPI + Pytest)
+- **Pipeline Tests:** Validation of Scikit-Learn logic, custom transformers, preprocessor structure.
+- **Model Tests:** Assertions verifying training loop, label matching, probability scoring structure, matrix dimensionality.
+- **API Tests:** Validates `/predict` validation logic, `/health` ping, `/metrics` structural returns.
+```bash
+cd ml-service
+pytest tests/ -v       # 37/37 integration and logic tests
+```
 
 ---
 

@@ -784,7 +784,7 @@
     <div class="cover">
       <div class="cover-badge">
         <span class="dot"></span>
-        Proje Tanıtım Belgesi &nbsp;·&nbsp; v1.0
+        Proje Tanıtım Belgesi &nbsp;·&nbsp; v2.0 — Canlı Deployment
       </div>
 
       <h1>Payment Failure<br /><span>Intelligence System</span></h1>
@@ -819,6 +819,10 @@
           <span class="value">Nisan 2026</span>
         </div>
         <div class="cover-meta-item">
+          <span class="label">Canlı Demo</span>
+          <span class="value">frontend-phi-self-xq19jn53gh.vercel.app</span>
+        </div>
+        <div class="cover-meta-item">
           <span class="label">GitHub</span>
           <span class="value">ataherdematay/payment-failure-intelligence-system</span>
         </div>
@@ -845,8 +849,9 @@
           <li>Dashboard Sayfaları ve Kullanım</li>
           <li>Makine Öğrenmesi Sistemi</li>
           <li>Backend API Referansı</li>
+          <li>Admin Paneli ve Veri Yönetimi</li>
           <li>Veri Yapısı ve Sentetik Veri</li>
-          <li>Kurulum ve Çalıştırma</li>
+          <li>Canlı Deployment Bilgileri</li>
           <li>Craftgate ile İlişkisi</li>
         </ol>
       </div>
@@ -886,12 +891,12 @@
 
         <div class="kpi-row">
           <div class="kpi-card">
-            <div class="kpi-value">10K</div>
-            <div class="kpi-label">İşlem Verisi</div>
+            <div class="kpi-value">5K</div>
+            <div class="kpi-label">Canlı İşlem</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-value">%82</div>
-            <div class="kpi-label">ML Doğruluğu</div>
+            <div class="kpi-value">%21</div>
+            <div class="kpi-label">ML Doğruluğu¹</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-value">5</div>
@@ -899,9 +904,10 @@
           </div>
           <div class="kpi-card">
             <div class="kpi-value">3</div>
-            <div class="kpi-label">Bağımsız Servis</div>
+            <div class="kpi-label">Canlı Servis</div>
           </div>
         </div>
+        <p style="font-size:11px;color:var(--ink-faint);margin-top:-8px">¹ Demo sentetik verisiyle elde edilen başlangıç değeri; şirketin gerçek verisiyle önemli ölçüde artar.</p>
       </div>
 
       <!-- ─── 2. KULLANICI KİTLESİ ──────────────────────── -->
@@ -1058,8 +1064,7 @@
             <div class="tl-desc">
               Ödeme işlemlerini temsil eden veri şeması tasarlandı. <code>transactions</code>
               tablosu; işlem tutarı, ödeme yöntemi, ülke, cihaz, gateway, başarı/başarısızlık
-              durumu ve başarısızlık nedeni alanlarını içermektedir. Python ile 10.000 adet
-              gerçekçi sentetik işlem üretildi ve PostgreSQL'e seed edildi.
+              durumu ve başarısızlık nedeni alanlarını içermektedir.
             </div>
           </div>
           <div class="tl-item">
@@ -1068,9 +1073,7 @@
             <div class="tl-desc">
               NestJS çatısıyla <em>Clean Architecture</em> prensiplerine uygun servis katmanları
               kuruldu. Transactions, Analytics, Insights ve ML proxy modülleri yazıldı.
-              Swagger UI entegre edildi (<code>:3001/api/docs</code>). PostgreSQL için
-              TypeORM ile migration tabanlı şema yönetimi sağlandı. Kritik SQL sözdizimi
-              hatası (<code>make_interval</code>) belirlenerek düzeltildi.
+              Swagger UI entegre edildi (<code>/api/docs</code>). TypeORM ile otomatik şema senkronizasyonu sağlandı.
             </div>
           </div>
           <div class="tl-item">
@@ -1078,10 +1081,8 @@
             <div class="tl-title">RandomForest Başarısızlık Sınıflandırıcı</div>
             <div class="tl-desc">
               FastAPI üzerinde bağımsız bir ML microservice inşa edildi. scikit-learn
-              ile RandomForestClassifier eğitildi; 5 sınıf (insufficient_funds,
-              network_error, fraud_suspected, expired_card, invalid_credentials) için
-              %82 doğruluk elde edildi. Model joblib ile serialize edilerek kalıcı
-              hale getirildi. <code>/predict</code> ve <code>/model/metrics</code>
+              ile RandomForestClassifier eğitildi; 5 başarısızlık sınıfı için tahmin yapılmaktadır.
+              <code>/predict</code>, <code>/model/metrics</code> ve <code>/model/retrain</code>
               endpoint'leri hazırlandı.
             </div>
           </div>
@@ -1089,20 +1090,38 @@
             <div class="tl-phase">Faz 4 — Frontend Dashboard</div>
             <div class="tl-title">5 Sayfalık Gerçek Zamanlı Dashboard</div>
             <div class="tl-desc">
-              Next.js 16 App Router ile 5 sayfalı dashboard tamamlandı. TanStack Query
+              Next.js App Router ile 5 sayfalı dashboard tamamlandı. TanStack Query
               ile tüm API çağrıları cache edildi. Recharts entegrasyonuyla area, bar,
-              pie ve composed chart'lar eklendi. Typed API client (<code>lib/api.ts</code>)
-              yeniden yazılarak NestJS ve FastAPI response şemaları eşleştirildi.
-              Glassmorphism temalı koyu renk tasarım sistemi oluşturuldu.
+              pie ve composed chart'lar eklendi. Glassmorphism temalı koyu renk tasarım sistemi oluşturuldu.
             </div>
           </div>
           <div class="tl-item">
             <div class="tl-phase">Faz 5 — Craftgate Entegrasyonu</div>
             <div class="tl-title">Sektöre Özel Hikaye ve Preset Senaryolar</div>
             <div class="tl-desc">
-              README tam anlamıyla Craftgate odaklı yeniden yazıldı. Simulation sayfasına
-              Craftgate ürünlerine doğrudan atıfla 4 preset senaryo eklendi:
+              Simulation sayfasına Craftgate ürünlerine doğrudan atıfla 4 preset senaryo eklendi:
               "Drop Square Gateway", "Retry Autopilot ON", "Peak Season", "Current State".
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 6 — Production Deployment</div>
+            <div class="tl-title">Vercel + Railway Üzerinde Tam Canlı Sistem</div>
+            <div class="tl-desc">
+              Frontend Vercel'e, Backend ve ML servisi Railway'e deploy edildi. Railway PostgreSQL
+              veritabanı otomatik şema senkronizasyonu (<code>synchronize: true</code>) ve startup
+              seed mekanizmasıyla 5.000 gerçekçi işlem kaydı ile dolduruldu. ESM/CJS uyumsuzluğu
+              (<code>uuid → crypto.randomUUID()</code>) giderildi; port binding sorunları çözüldü.
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-phase">Faz 7 — Login &amp; Admin Paneli</div>
+            <div class="tl-title">JWT Auth + CSV Veri Yükleme + Şirket Verisi Desteği</div>
+            <div class="tl-desc">
+              <code>POST /auth/login</code> endpoint'i ve JWT tabanlı kimlik doğrulama eklendi.
+              Admin panelinde şirketin kendi gerçek ödeme verilerini CSV formatında yükleyip
+              analiz edebileceği alan hayata geçirildi. ML modelinin API üzerinden yeniden
+              eğitilmesi (<code>POST /model/retrain</code>) ve veri sıfırlama butonları eklendi.
+              Sidebar'a giriş/çıkış ve admin linki entegre edildi.
             </div>
           </div>
         </div>
@@ -1319,7 +1338,7 @@
           <div class="section-number">07</div>
           <div class="section-title">
             Backend API Referansı
-            <small>NestJS :3001 ve FastAPI :8000</small>
+            <small>NestJS (Railway) ve FastAPI ML Servisi (Railway)</small>
           </div>
         </div>
 
@@ -1330,55 +1349,88 @@
               <tr>
                 <th>Endpoint</th>
                 <th>Method</th>
+                <th>Auth</th>
                 <th>Açıklama</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td><code>/auth/login</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td>—</td>
+                <td>JWT token döner (email + password)</td>
+              </tr>
+              <tr>
                 <td><code>/transactions</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>Filtrelenebilir, sayfalandırılmış işlem listesi</td>
               </tr>
               <tr>
                 <td><code>/transactions/summary</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>KPI özeti: toplam, başarısız, oran, risk</td>
+              </tr>
+              <tr>
+                <td><code>/transactions/upload</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td><span class="badge">JWT</span></td>
+                <td>CSV dosyası yükle — şirketin gerçek verisi</td>
+              </tr>
+              <tr>
+                <td><code>/transactions/seed</code></td>
+                <td><span class="endpoint-method method-post">POST</span></td>
+                <td>—</td>
+                <td>5.000 sentetik demo verisi ekle</td>
+              </tr>
+              <tr>
+                <td><code>/transactions/clear</code></td>
+                <td><span class="endpoint-method" style="background:#fee2e2;color:#991b1b">DELETE</span></td>
+                <td><span class="badge">JWT</span></td>
+                <td>Tüm işlem kayıtlarını sil (admin)</td>
               </tr>
               <tr>
                 <td><code>/analytics/failure-by-reason</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>Neden bazlı başarısızlık dağılımı</td>
               </tr>
               <tr>
                 <td><code>/analytics/daily-trend</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
-                <td>Son N günlük günlük işlem trendi</td>
+                <td>—</td>
+                <td>Son N günlük işlem trendi</td>
               </tr>
               <tr>
                 <td><code>/analytics/gateway-performance</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>Gateway bazlı başarısızlık oranı ve hacim</td>
               </tr>
               <tr>
                 <td><code>/analytics/hourly-pattern</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>24 saatlik saat bazlı desen</td>
               </tr>
               <tr>
                 <td><code>/insights</code></td>
                 <td><span class="endpoint-method method-get">GET</span></td>
+                <td>—</td>
                 <td>Otomatik üretilen içgörü kartları</td>
               </tr>
               <tr>
                 <td><code>/ml/predict</code></td>
                 <td><span class="endpoint-method method-post">POST</span></td>
+                <td>—</td>
                 <td>FastAPI ML servisine proxy tahmin isteği</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <h3 class="sub">FastAPI ML Service — :8000</h3>
+        <h3 class="sub">FastAPI ML Service</h3>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1414,10 +1466,105 @@
         </div>
       </div>
 
-      <!-- ─── 8. VERİ ────────────────────────────────────── -->
+      <!-- ─── 8. ADMİN PANELİ ──────────────────────────── -->
       <div class="section">
         <div class="section-header">
           <div class="section-number">08</div>
+          <div class="section-title">
+            Admin Paneli ve Veri Yönetimi
+            <small>Şirketin kendi verisiyle sistemi özelleştirme</small>
+          </div>
+        </div>
+
+        <p>
+          Sistem yalnızca demo sentetik verisiyle değil, <strong>şirketin kendi gerçek ödeme verileriyle</strong>
+          de çalışacak şekilde tasarlanmıştır. Admin paneli bu süreci uçtan uca yönetir.
+        </p>
+
+        <div class="callout accent">
+          <span class="icon">🔐</span>
+          <div class="text">
+            <strong>Admin Girişi:</strong> Dashboard sidebar'ındaki "Admin Girişi" bağlantısı veya
+            doğrudan <code>/login</code> sayfasından erişilir.<br />
+            Varsayılan: <code>admin@pfis.com</code> / <code>pfis2026</code><br />
+            (Railway Variables üzerinden <code>ADMIN_EMAIL</code> ve <code>ADMIN_PASSWORD</code> değiştirilebilir.)
+          </div>
+        </div>
+
+        <h3 class="sub">Admin Paneli Özellikleri</h3>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="fc-icon">📤</div>
+            <div class="fc-title">CSV Veri Yükleme</div>
+            <div class="fc-desc">
+              Şirketin kendi ödeme transaction kayıtlarını CSV formatında yükleyin.
+              Sistem kolonu otomatik eşleştirir ve veritabanına ekler.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">⬇️</div>
+            <div class="fc-title">CSV Şablon İndirme</div>
+            <div class="fc-desc">
+              Boş CSV şablonu indirin, kendi verilerinizi doldurup tekrar yükleyin.
+              Tüm desteklenen sütunlar ve format açıklanmaktadır.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">🤖</div>
+            <div class="fc-title">ML Modelini Yeniden Eğit</div>
+            <div class="fc-desc">
+              Veri yüklendikten sonra tek butonla ML modeli yeni verilerle yeniden eğitilir.
+              Doğruluk oranı ve model versiyonu anlık raporlanır.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">⚙️</div>
+            <div class="fc-title">Veri Yönetimi</div>
+            <div class="fc-desc">
+              Demo veri ekle (5K sentetik), tüm veritabanını sıfırla veya gerçek veri
+              yükleyip sistemi sıfırdan kurgula.
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub">CSV Format Gereksinimleri</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sütun</th>
+                <th>Zorunlu</th>
+                <th>Örnek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>amount</code></td><td><span class="badge">Evet</span></td><td>150.00</td></tr>
+              <tr><td><code>status</code></td><td><span class="badge gray">Hayır</span></td><td>success / failed / pending</td></tr>
+              <tr><td><code>failure_reason</code></td><td><span class="badge gray">Hayır</span></td><td>insufficient_funds</td></tr>
+              <tr><td><code>payment_method</code></td><td><span class="badge gray">Hayır</span></td><td>credit_card, bank_transfer</td></tr>
+              <tr><td><code>gateway</code></td><td><span class="badge gray">Hayır</span></td><td>iyzico, stripe, paytr</td></tr>
+              <tr><td><code>country</code></td><td><span class="badge gray">Hayır</span></td><td>TR, US, DE</td></tr>
+              <tr><td><code>device</code></td><td><span class="badge gray">Hayır</span></td><td>mobile, desktop, tablet</td></tr>
+              <tr><td><code>risk_score</code></td><td><span class="badge gray">Hayır</span></td><td>0.0 – 1.0</td></tr>
+              <tr><td><code>created_at</code></td><td><span class="badge gray">Hayır</span></td><td>2024-01-15T10:30:00Z</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ol class="styled">
+          <li>Admin girişi yapın → <code>/login</code></li>
+          <li>"Örnek CSV Şablonu İndir" ile boş şablonu alın</li>
+          <li>Şirketinizin ödeme verilerini şablona doldurun</li>
+          <li>"CSV Dosyası Seç &amp; Yükle" ile yükleyin</li>
+          <li>"Modeli Yeniden Eğit" ile ML'i güncelleyin</li>
+          <li>Dashboard'da gerçek verilerinizi analiz edin 🎉</li>
+        </ol>
+      </div>
+
+      <!-- ─── 9. VERİ ────────────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">09</div>
           <div class="section-title">
             Veri Yapısı ve Sentetik Veri Üretimi
             <small>İşlem modeli ve test verisi nasıl oluşturuldu?</small>
@@ -1503,72 +1650,104 @@
         </div>
       </div>
 
-      <!-- ─── 9. KURULUM ────────────────────────────────── -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-number">09</div>
-          <div class="section-title">
-            Kurulum ve Çalıştırma
-            <small>Sıfırdan sistemi ayağa kaldırma adımları</small>
-          </div>
-        </div>
-
-        <div class="callout info">
-          <span class="icon">📋</span>
-          <div class="text">
-            <strong>Gereksinimler:</strong> Node.js 20+ · Python 3.9+ · PostgreSQL 16+ (Homebrew:
-            <code>brew install postgresql@16</code>)
-          </div>
-        </div>
-
-        <h3 class="sub">1 — Veritabanı Oluşturma</h3>
-        <div class="code-block">
-          <pre><span class="cmt"># PostgreSQL başlat</span>
-<span class="cmd">brew services start</span> postgresql@16
-<span class="cmd">createdb</span> pfis_db
-<span class="cmd">psql</span> postgres -c <span class="str">"CREATE USER pfis WITH PASSWORD 'pfis_secret_2026';"</span>
-<span class="cmd">psql</span> postgres -c <span class="str">"ALTER DATABASE pfis_db OWNER TO pfis;"</span></pre>
-        </div>
-
-        <h3 class="sub">2 — Sentetik Veri Üretme ve Seed</h3>
-        <div class="code-block">
-          <pre><span class="cmd">cd</span> data-generator
-<span class="cmd">python3 -m venv</span> venv <span class="cmt">&amp;&amp;</span> <span class="cmd">source</span> venv/bin/activate
-<span class="cmd">pip install -r</span> requirements.txt
-<span class="cmd">python</span> generate.py --count <span class="num">10000</span> --output csv
-<span class="cmd">python</span> seed_db.py</pre>
-        </div>
-
-        <h3 class="sub">3 — Backend (Terminal 1)</h3>
-        <div class="code-block">
-          <pre><span class="cmd">cd</span> backend
-<span class="cmd">cp</span> .env.example .env   <span class="cmt"># DB bilgilerini düzenle</span>
-<span class="cmd">npm install</span>
-<span class="cmd">npm run start:dev</span>      <span class="cmt"># → http://localhost:3001/api/docs</span></pre>
-        </div>
-
-        <h3 class="sub">4 — ML Servisi (Terminal 2)</h3>
-        <div class="code-block">
-          <pre><span class="cmd">cd</span> ml-service
-<span class="cmd">python3 -m venv</span> venv <span class="cmt">&amp;&amp;</span> <span class="cmd">source</span> venv/bin/activate
-<span class="cmd">pip install -r</span> requirements.txt
-<span class="cmd">python -m app.train</span>    <span class="cmt"># RandomForest modelini eğit</span>
-<span class="cmd">uvicorn</span> app.main:app --reload --port <span class="num">8000</span></pre>
-        </div>
-
-        <h3 class="sub">5 — Frontend (Terminal 3)</h3>
-        <div class="code-block">
-          <pre><span class="cmd">cd</span> frontend
-<span class="cmd">cp</span> .env.local.example .env.local
-<span class="cmd">npm install</span>
-<span class="cmd">npm run dev</span>            <span class="cmt"># → http://localhost:3000</span></pre>
-        </div>
-      </div>
-
-      <!-- ─── 10. CRAFTGATE ─────────────────────────────── -->
+      <!-- ─── 10. CANLI DEPLOYMENT ────────────────────────── -->
       <div class="section">
         <div class="section-header">
           <div class="section-number">10</div>
+          <div class="section-title">
+            Canlı Deployment Bilgileri
+            <small>Production ortamı — Vercel + Railway</small>
+          </div>
+        </div>
+
+        <div class="callout success">
+          <span class="icon">🌐</span>
+          <div class="text">
+            <strong>Sistem tamamen canlıda ve erişilebilir durumda.</strong><br />
+            Herhangi bir kurulum gerekmeden doğrudan tarayıcıdan kullanılabilir.
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Servis</th>
+                <th>Platform</th>
+                <th>URL</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Frontend</strong></td>
+                <td>Vercel</td>
+                <td><code>frontend-phi-self-xq19jn53gh.vercel.app</code></td>
+                <td><span class="badge green">✅ Canlı</span></td>
+              </tr>
+              <tr>
+                <td><strong>Backend API</strong></td>
+                <td>Railway</td>
+                <td><code>pfis-backend-production.up.railway.app</code></td>
+                <td><span class="badge green">✅ Canlı</span></td>
+              </tr>
+              <tr>
+                <td><strong>ML Servisi</strong></td>
+                <td>Railway</td>
+                <td><code>pfis-ml-production.up.railway.app</code></td>
+                <td><span class="badge green">✅ Canlı</span></td>
+              </tr>
+              <tr>
+                <td><strong>PostgreSQL</strong></td>
+                <td>Railway</td>
+                <td>Internal (5.000 işlem kayıtlı)</td>
+                <td><span class="badge green">✅ Canlı</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">Environment Variables (Railway)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Değişken</th><th>Açıklama</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>ADMIN_EMAIL</code></td><td>Admin giriş e-postası (varsayılan: admin@pfis.com)</td></tr>
+              <tr><td><code>ADMIN_PASSWORD</code></td><td>Admin şifresi (varsayılan: pfis2026)</td></tr>
+              <tr><td><code>JWT_SECRET</code></td><td>JWT imzalama anahtarı</td></tr>
+              <tr><td><code>POSTGRES_HOST / DB / USER / PASSWORD / PORT</code></td><td>Railway PostgreSQL bağlantısı</td></tr>
+              <tr><td><code>ML_SERVICE_URL</code></td><td>FastAPI servise backend proxy URL</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">Yerel Kurulum (Opsiyonel)</h3>
+        <div class="callout info">
+          <span class="icon">📋</span>
+          <div class="text">
+            <strong>Gereksinimler:</strong> Node.js 20+ · Python 3.9+ · PostgreSQL 16+
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><span class="cmt"># Backend</span>
+<span class="cmd">cd</span> backend &amp;&amp; <span class="cmd">cp</span> .env.example .env
+<span class="cmd">npm install</span> &amp;&amp; <span class="cmd">npm run start:dev</span>   <span class="cmt"># → :3001/api/docs</span>
+
+<span class="cmt"># ML Servisi</span>
+<span class="cmd">cd</span> ml-service &amp;&amp; <span class="cmd">pip install -r</span> requirements.txt
+<span class="cmd">uvicorn</span> app.main:app --reload --port <span class="num">8000</span>
+
+<span class="cmt"># Frontend</span>
+<span class="cmd">cd</span> frontend &amp;&amp; <span class="cmd">npm install</span> &amp;&amp; <span class="cmd">npm run dev</span>   <span class="cmt"># → :3000</span></pre>
+        </div>
+      </div>
+
+      <!-- ─── 11. CRAFTGATE ─────────────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">11</div>
           <div class="section-title">
             Craftgate ile İlişkisi
             <small>Bu projenin Craftgate'in iş problemleriyle örtüşmesi</small>
@@ -1650,10 +1829,10 @@
       <div class="callout success">
         <span class="icon">✅</span>
         <div class="text">
-          <strong>Projenin GitHub Adresi:</strong><br />
-          <code>https://github.com/ataherdematay/payment-failure-intelligence-system</code><br /><br />
-          Tüm kaynak kod, API dokümantasyonu (Swagger), ML eğitim scripti ve
-          veri üretici bu repoda eksiksiz yer almaktadır.
+          <strong>Canlı Demo:</strong> <code>https://frontend-phi-self-xq19jn53gh.vercel.app</code><br />
+          <strong>GitHub:</strong> <code>https://github.com/ataherdematay/payment-failure-intelligence-system</code><br /><br />
+          Tüm kaynak kod, API dokümantasyonu (Swagger), ML eğitim scripti, admin paneli
+          ve CSV veri yükleme özelliği bu repoda eksiksiz yer almaktadır.
         </div>
       </div>
 
@@ -1662,7 +1841,7 @@
     <!-- Footer -->
     <div class="doc-footer">
       <div class="left">
-        <strong>Payment Failure Intelligence System</strong> — Proje Belgesi v1.0<br />
+        <strong>Payment Failure Intelligence System</strong> — Proje Belgesi v2.0<br />
         Ata Herdem Atay · Nisan 2026 · Craftgate Teknoloji A.Ş. Sunumu
       </div>
       <div class="right">PFIS · github/ataherdematay</div>

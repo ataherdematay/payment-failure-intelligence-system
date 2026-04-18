@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { Transaction } from './transaction.entity';
@@ -11,7 +12,7 @@ import { JwtStrategy } from '../auth/jwt.strategy';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Transaction]),
-    MulterModule.register({ dest: '/tmp/uploads' }),
+    MulterModule.register({ storage: memoryStorage() }),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'pfis-super-secret-2026',
